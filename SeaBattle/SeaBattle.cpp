@@ -7,9 +7,9 @@ int main()
     /*CLEANED the code*/
 
 
-    BattleCell bc1({ 49, 49 }, sf::Color::Red, sf::Color::White);
+    Button bc1({ 49, 49 }, sf::Color::Red, sf::Color::White);
     bc1.setPosition({ 175, 175 });
-    BattleCell bc2({ 49, 49 }, sf::Color::Red, sf::Color::White);
+    Button bc2({ 49, 49 }, sf::Color::Red, sf::Color::White);
     bc2.setPosition({ 225, 175 });
     sf::VertexArray lineGorizontal(sf::PrimitiveType::Lines, 11 * 2);
     sf::VertexArray lineVertical(sf::PrimitiveType::Lines, 11 * 2);
