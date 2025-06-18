@@ -1,4 +1,5 @@
 ﻿#include "Classes.h"
+#include <iostream>
 
 int main()
 {
@@ -7,10 +8,10 @@ int main()
     /*CLEANED the code*/
 
 
-    Button bc1({ 49, 49 }, sf::Color::Red, sf::Color::White);
-    bc1.setPosition({ 175, 175 });
-    Button bc2({ 49, 49 }, sf::Color::Red, sf::Color::White);
-    bc2.setPosition({ 225, 175 });
+    Button btn1({ 49, 49 }, sf::Color::Red, sf::Color::White);
+    btn1.setPosition({ 175, 175 });
+    Button btn2({ 49, 49 }, sf::Color::Red, sf::Color::White);
+    btn2.setPosition({ 225, 175 });
     sf::VertexArray lineGorizontal(sf::PrimitiveType::Lines, 11 * 2);
     sf::VertexArray lineVertical(sf::PrimitiveType::Lines, 11 * 2);
     int linePosGorizontal = 175;
@@ -45,27 +46,33 @@ int main()
                 window.close();
             if (event->is<sf::Event::MouseMoved>())
             {
-                if (bc1.isMouseOver(window))
+                if (btn1.isMouseOver(window))
                 {
-                    bc1.setBackColor(sf::Color::White);
+                    btn1.setBackColor(sf::Color::White);
+
                 }
-                else if (bc2.isMouseOver(window))
+                else if (btn2.isMouseOver(window))
                 {
-                    bc2.setBackColor(sf::Color::White);
+                    btn2.setBackColor(sf::Color::White);
                 }
                 else
                 {
-                    bc1.setBackColor(sf::Color::Red);
-                    bc2.setBackColor(sf::Color::Red);
+                    btn1.setBackColor(sf::Color::Red);
+                    btn2.setBackColor(sf::Color::Red);
                 }
+            }
+            if (const auto* clicked = event->getIf<sf::Event::MouseButtonPressed>())
+            {
+                if (clicked->button == sf::Mouse::Button::Left && btn1.isMouseOver(window))
+                    std::cout << "button 1 was clicked\n";
             }
         }
 
         window.clear();
         window.draw(lineGorizontal);
         window.draw(lineVertical);
-        bc1.drawTo(window);
-        bc2.drawTo(window);
+        btn1.drawTo(window);
+        btn2.drawTo(window);
         window.display();
     }
 }
