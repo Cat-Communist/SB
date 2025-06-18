@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/SeaBattle/resource.h
+/SeaBattle/SeaBattle.cpp
+/SeaBattle/SeaBattle.rc
+/SeaBattle/SeaBattle.vcxproj
+/SeaBattle/SeaBattle.vcxproj.filters
