@@ -119,7 +119,6 @@ int main()
             
         }
 
-
         window.clear();
         window.draw(lineGorizontal);
         window.draw(lineVertical);
