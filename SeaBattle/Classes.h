@@ -3,56 +3,62 @@
 #include <SFML/Graphics.hpp>
 #include "Classes.h"
 
-class BattleCell {
+class Button {
 public:
-    BattleCell(sf::Vector2f size, sf::Color bgColor, sf::Color olColor)
+    //setting the button initial size, background color and outline color
+    Button(sf::Vector2f size, sf::Color bgColor, sf::Color olColor)
     {
-        battlecell.setSize(size);
-        battlecell.setFillColor(bgColor);
-        battlecell.setOutlineColor(olColor);
-        battlecell.setOutlineThickness(1.f);
+        button.setSize(size);
+        button.setFillColor(bgColor);
+        button.setOutlineColor(olColor);
+        button.setOutlineThickness(1.f);
     }
 
+    //setting the button background color
     void setBackColor(sf::Color color)
     {
-        battlecell.setFillColor(color);
+        button.setFillColor(color);
     }
-
+    
+    //setting the button background color
     void setLineColor(sf::Color color)
     {
-        battlecell.setOutlineColor(color);
+        button.setOutlineColor(color);
     }
 
+    //setting the position of the button
     void setPosition(sf::Vector2f pos)
     {
-        battlecell.setPosition(pos);
+        button.setPosition(pos);
 
-        float xPos = (pos.x + battlecell.getSize().x / 2);
-        float yPos = (pos.y + battlecell.getSize().y / 2);
+        float xPos = (pos.x + button.getSize().x / 2);
+        float yPos = (pos.y + button.getSize().y / 2);
     }
 
+    //funtion to draw button
     void drawTo(sf::RenderWindow& window)
     {
-        window.draw(battlecell);
+        window.draw(button);
     }
 
+    //check if mouse is over the button
     bool isMouseOver(sf::RenderWindow& window)
     {
         int mouseX = sf::Mouse::getPosition(window).x;
         int mouseY = sf::Mouse::getPosition(window).y;
 
-        float bcPosX = battlecell.getPosition().x;
-        float bcPosY = battlecell.getPosition().y;
+        float btnPosX = button.getPosition().x;
+        float btnPosY = button.getPosition().y;
 
-        float bcxPosWidth = battlecell.getPosition().x + battlecell.getSize().x;
-        float bcyPosWidth = battlecell.getPosition().y + battlecell.getSize().y;
+        float btnxPosWidth = button.getPosition().x + button.getSize().x;
+        float btnyPosWidth = button.getPosition().y + button.getSize().y;
 
-        if (mouseX < bcxPosWidth && mouseX > bcPosX && mouseY < bcyPosWidth && mouseY > bcPosY)
+        if (mouseX < btnxPosWidth && mouseX > btnPosX && mouseY < btnyPosWidth && mouseY > btnPosY)
         {
             return true;
         }
         return false;
     }
 private:
-	sf::RectangleShape battlecell;
+	sf::RectangleShape button;
 };
