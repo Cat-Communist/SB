@@ -66,12 +66,13 @@ class Main_menu {
 private:
     int Selected{}; //selected tile
     sf::Font arial; //font
-    sf::Text Tiles[MAX_MENU_TILES]; //array of tiles
+    const int PvsP = 1;
+    const int PvsC = 2;
+    const int Exit = 3;
 public:
     //construct of Menu
     Main_menu(float width, float height)
     {
-        arial.openFromFile("FONTS/arialmt.ttf");
 
     }
     //function to draw Menu 
