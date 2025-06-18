@@ -116,7 +116,6 @@ int main()
                     bc2.setBackColor(sf::Color::Red);
                 }
             }
-            
         }
 
         window.clear();
