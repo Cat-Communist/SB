@@ -1,12 +1,11 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
-#include "Classes.h"
+#define MAX_MENU_TILES 3
 
 class Button {
 public:
-    //setting the button initial size, background color and outline color
-    Button(sf::Vector2f size, sf::Color bgColor, sf::Color olColor)
+    //cunstructor of the btn setting initial size, background color and outline color
+    Button(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor)
     {
         button.setSize(size);
         button.setFillColor(bgColor);
@@ -20,7 +19,7 @@ public:
         button.setFillColor(color);
     }
     
-    //setting the button background color
+    //setting the button outline color
     void setLineColor(sf::Color color)
     {
         button.setOutlineColor(color);
@@ -31,7 +30,7 @@ public:
     {
         button.setPosition(pos);
 
-        float xPos = (pos.x + button.getSize().x / 2);
+        float xPos = (pos.x + button.getSize().x / 2); //NOTE: Why? For what purpose?
         float yPos = (pos.y + button.getSize().y / 2);
     }
 
@@ -61,4 +60,25 @@ public:
     }
 private:
 	sf::RectangleShape button;
+};
+
+class Main_menu {
+private:
+    int Selected{}; //selected tile
+    sf::Font arial; //font
+    sf::Text Tiles[MAX_MENU_TILES]; //array of tiles
+public:
+    //construct of Menu
+    Main_menu(float width, float height)
+    {
+        arial.openFromFile("FONTS/arialmt.ttf");
+
+    }
+    //function to draw Menu 
+    void drawTo(sf::RenderWindow& window)
+    {
+        for (int i{}; i < MAX_MENU_TILES; i++)
+            //window.draw(Tiles[i]);
+            i++;
+    }
 };
