@@ -5,13 +5,23 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode({ 850, 900 }), "BattleField");
     //battlefield
-    /*CLEANED the code*/
-
-
-    Button btn1({ 49, 49 }, sf::Color::Red, sf::Color::White);
-    btn1.setPosition({ 175, 175 });
-    Button btn2({ 49, 49 }, sf::Color::Red, sf::Color::White);
-    btn2.setPosition({ 225, 175 });
+    BattleCell testBattleField[10][10];
+    float positionX = 175;
+    float positionY = 175;
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            testBattleField[i][j] = BattleCell({ 49, 49 }, sf::Color::Black, sf::Color::White, 0);
+        }
+    }
+    for (int i = 0; i < 10; ++i) {
+        positionX = 175;
+        for (int j = 0; j < 10; ++j) {
+            testBattleField[i][j].setPosition({ positionX, positionY });
+            positionX = positionX + 50;
+        }
+        positionY = positionY + 50;
+    }
+    positionY = 175;
     sf::VertexArray lineGorizontal(sf::PrimitiveType::Lines, 11 * 2);
     sf::VertexArray lineVertical(sf::PrimitiveType::Lines, 11 * 2);
     int linePosGorizontal = 175;
@@ -38,6 +48,8 @@ int main()
 
         linePosVertical += 50;
     }
+
+    bool wasClicked = false;
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
@@ -46,33 +58,53 @@ int main()
                 window.close();
             if (event->is<sf::Event::MouseMoved>())
             {
-                if (btn1.isMouseOver(window))
-                {
-                    btn1.setBackColor(sf::Color::White);
-
-                }
-                else if (btn2.isMouseOver(window))
-                {
-                    btn2.setBackColor(sf::Color::White);
-                }
-                else
-                {
-                    btn1.setBackColor(sf::Color::Red);
-                    btn2.setBackColor(sf::Color::Red);
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        if (testBattleField[i][j].isMouseOver(window))
+                        {
+                            testBattleField[i][j].setBackColor(sf::Color::White);
+                        }
+                        else
+                        {
+                            testBattleField[i][j].setBackColor(sf::Color::Black);
+                        }
+                    }
                 }
             }
-            if (const auto* clicked = event->getIf<sf::Event::MouseButtonPressed>())
+            if (event->is<sf::Event::MouseButtonPressed>() && !wasClicked)
             {
-                if (clicked->button == sf::Mouse::Button::Left && btn1.isMouseOver(window))
-                    std::cout << "button 1 was clicked\n";
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        if (testBattleField[i][j].isMouseOver(window))
+                        {
+                            testBattleField[i][j].setBackColor(sf::Color::Red);
+                            wasClicked = !wasClicked ? true : false;
+                        }
+                    }
+                }
+            }
+            else if (event->is<sf::Event::MouseButtonPressed>() && wasClicked)
+            {
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        if (testBattleField[i][j].isMouseOver(window))
+                        {
+                            testBattleField[i][j].setBackColor(sf::Color::Black);
+                            wasClicked = !wasClicked ? true : false;
+                        }
+                    }
+                }
             }
         }
 
         window.clear();
         window.draw(lineGorizontal);
         window.draw(lineVertical);
-        btn1.drawTo(window);
-        btn2.drawTo(window);
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                testBattleField[i][j].drawTo(window);
+            }
+        }
         window.display();
     }
 }
