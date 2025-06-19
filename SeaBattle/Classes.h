@@ -60,6 +60,17 @@ public:
         }
         return false;
     }
+
+    void setIndex(int newIndex)
+    {
+        index = newIndex;
+    }
+
+    int getIndex() const
+    {
+        return index;
+    }
+
 private:
     sf::RectangleShape button;
     int index;

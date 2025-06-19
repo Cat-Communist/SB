@@ -49,7 +49,6 @@ int main()
         linePosVertical += 50;
     }
 
-    bool wasClicked = false;
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
@@ -60,37 +59,33 @@ int main()
             {
                 for (int i = 0; i < 10; ++i) {
                     for (int j = 0; j < 10; ++j) {
-                        if (testBattleField[i][j].isMouseOver(window))
+                        if (testBattleField[i][j].isMouseOver(window) && testBattleField[i][j].getIndex() == 0)
                         {
                             testBattleField[i][j].setBackColor(sf::Color::White);
                         }
-                        else
+                        else if (testBattleField[i][j].getIndex() == 0)
                         {
                             testBattleField[i][j].setBackColor(sf::Color::Black);
                         }
                     }
                 }
             }
-            if (event->is<sf::Event::MouseButtonPressed>() && !wasClicked)
+            if (event->is<sf::Event::MouseButtonPressed>())
             {
                 for (int i = 0; i < 10; ++i) {
                     for (int j = 0; j < 10; ++j) {
                         if (testBattleField[i][j].isMouseOver(window))
                         {
-                            testBattleField[i][j].setBackColor(sf::Color::Red);
-                            wasClicked = !wasClicked ? true : false;
-                        }
-                    }
-                }
-            }
-            else if (event->is<sf::Event::MouseButtonPressed>() && wasClicked)
-            {
-                for (int i = 0; i < 10; ++i) {
-                    for (int j = 0; j < 10; ++j) {
-                        if (testBattleField[i][j].isMouseOver(window))
-                        {
-                            testBattleField[i][j].setBackColor(sf::Color::Black);
-                            wasClicked = !wasClicked ? true : false;
+                            if (testBattleField[i][j].getIndex() == 1)
+                            {
+                                testBattleField[i][j].setIndex(0);
+                                testBattleField[i][j].setBackColor(sf::Color::Black);
+                            }
+                            else
+                            {
+                                testBattleField[i][j].setIndex(1);
+                                testBattleField[i][j].setBackColor(sf::Color::Red);
+                            }
                         }
                     }
                 }
