@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#define MAX_MENU_TILES 3
 
 class Button {
 public:
@@ -62,24 +61,8 @@ private:
 	sf::RectangleShape button;
 };
 
-class Main_menu {
-private:
-    int Selected{}; //selected tile
-    sf::Font arial; //font
-    const int PvsP = 1;
-    const int PvsC = 2;
-    const int Exit = 3;
-public:
-    //construct of Menu
-    Main_menu(float width, float height)
-    {
-
-    }
-    //function to draw Menu 
-    void drawTo(sf::RenderWindow& window)
-    {
-        for (int i{}; i < MAX_MENU_TILES; i++)
-            //window.draw(Tiles[i]);
-            i++;
-    }
+enum class screens {
+    MainMenu,
+    BattleField,
+    EndGame
 };
