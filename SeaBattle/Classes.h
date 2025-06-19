@@ -32,6 +32,11 @@ public:
         float xPos = (pos.x + button.getSize().x / 2); //NOTE: Why? For what purpose?
         float yPos = (pos.y + button.getSize().y / 2);
     }
+    
+    void setOrigin(sf::Vector2f pos)
+    {
+        button.setOrigin(pos);
+    }
 
     //funtion to draw button
     void drawTo(sf::RenderWindow& window)
