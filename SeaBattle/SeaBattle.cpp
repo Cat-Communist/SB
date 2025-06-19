@@ -46,11 +46,24 @@ int main()
             }
             case static_cast<int>(screens::BattleField):
             {
-                //old version of 
-                Button bc1({ 49, 49 }, sf::Color::Red, sf::Color::White);
-                bc1.setPosition({ 175, 175 });
-                Button bc2({ 49, 49 }, sf::Color::Red, sf::Color::White);
-                bc2.setPosition({ 225, 175 });
+                
+                BattleCell testBattleField[10][10];
+                float positionX = 175;
+                float positionY = 175;
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        testBattleField[i][j] = BattleCell({ 49, 49 }, sf::Color::Black, sf::Color::White, 0);
+                    }
+                }
+                for (int i = 0; i < 10; ++i) {
+                    positionX = 175;
+                    for (int j = 0; j < 10; ++j) {
+                        testBattleField[i][j].setPosition({ positionX, positionY });
+                        positionX = positionX + 50;
+                    }
+                    positionY = positionY + 50;
+                }
+                positionY = 175;
                 sf::VertexArray lineGorizontal(sf::PrimitiveType::Lines, 11 * 2);
                 sf::VertexArray lineVertical(sf::PrimitiveType::Lines, 11 * 2);
                 int linePosGorizontal = 175;
@@ -77,37 +90,57 @@ int main()
 
                     linePosVertical += 50;
                 }
-                      
-                if (event->is<sf::Event::Closed>())
-                    window.close();
-                if (event->is<sf::Event::MouseMoved>())
+
+                while (window.isOpen())
                 {
-                    if (bc1.isMouseOver(window))
+                    while (const std::optional event = window.pollEvent())
                     {
-                        bc1.setBackColor(sf::Color::White);
+                        if (event->is<sf::Event::Closed>())
+                            window.close();
+                        if (event->is<sf::Event::MouseMoved>())
+                        {
+                            for (int i = 0; i < 10; ++i) {
+                                for (int j = 0; j < 10; ++j) {
+                                    if (testBattleField[i][j].isMouseOver(window) && testBattleField[i][j].getIndex() == 0)
+                                    {
+                                        testBattleField[i][j].setBackColor(sf::Color::White);
+                                    }
+                                    else if (testBattleField[i][j].getIndex() == 0)
+                                    {
+                                        testBattleField[i][j].setBackColor(sf::Color::Black);
+                                    }
+                                }
+                            }
+                        }
+                        if (event->is<sf::Event::MouseButtonPressed>())
+                        {
+                            for (int i = 0; i < 10; ++i) {
+                                for (int j = 0; j < 10; ++j) {
+                                    if (testBattleField[i][j].isMouseOver(window))
+                                    {
+                                        if (testBattleField[i][j].getIndex() == 1)
+                                        {
+                                            testBattleField[i][j].setIndex(0);
+                                            testBattleField[i][j].setBackColor(sf::Color::Black);
+                                        }
+                                        else
+                                        {
+                                            testBattleField[i][j].setIndex(1);
+                                            testBattleField[i][j].setBackColor(sf::Color::Red);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    else if (bc2.isMouseOver(window))
-                    {
-                        bc2.setBackColor(sf::Color::White);
+                    window.draw(lineGorizontal);
+                    window.draw(lineVertical);
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            testBattleField[i][j].drawTo(window);
+                        }
                     }
-                    else
-                    {
-                        bc1.setBackColor(sf::Color::Red);
-                        bc2.setBackColor(sf::Color::Red);
-                    }
-                }
-                    
-                window.draw(lineGorizontal);
-                window.draw(lineVertical);
-                bc1.drawTo(window);
-                bc2.drawTo(window);
-               
-                break;
-            }
-            case static_cast<int>(screens::EndGame):
-            {
-                break;
-            }
+                    window.clear();
             }
 
             //close Event
@@ -117,7 +150,6 @@ int main()
             //refresh window
             window.display();
             window.clear(sf::Color::Black);
-        }
     }
 
 }

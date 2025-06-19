@@ -1,10 +1,13 @@
 #pragma once
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
-class Button {
+class BattleCell {
 public:
+    BattleCell() = default;
     //cunstructor of the btn setting initial size, background color and outline color
-    Button(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor)
+    BattleCell(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor, int index)
+        : index(index)
     {
         button.setSize(size);
         button.setFillColor(bgColor);
@@ -17,7 +20,7 @@ public:
     {
         button.setFillColor(color);
     }
-    
+
     //setting the button outline color
     void setLineColor(sf::Color color)
     {
@@ -29,7 +32,7 @@ public:
     {
         button.setPosition(pos);
 
-        float xPos = (pos.x + button.getSize().x / 2); //NOTE: Why? For what purpose?
+        float xPos = (pos.x + button.getSize().x / 2);
         float yPos = (pos.y + button.getSize().y / 2);
     }
     
@@ -62,12 +65,25 @@ public:
         }
         return false;
     }
-private:
-	sf::RectangleShape button;
-};
 
+<<<<<<< HEAD
 enum class screens {
     MainMenu,
     BattleField,
     EndGame
+=======
+    void setIndex(int newIndex)
+    {
+        index = newIndex;
+    }
+
+    int getIndex() const
+    {
+        return index;
+    }
+
+private:
+    sf::RectangleShape button;
+    int index;
+>>>>>>> UpdatedBattleField
 };
