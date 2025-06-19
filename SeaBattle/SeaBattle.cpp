@@ -22,13 +22,13 @@ int main()
                 sf::Sprite bg_sprite(bg_texture);
                 bg_sprite.scale({ 4.5, 5.f });
                 window.draw(bg_sprite);
-                
+
                 sf::Vector2f btn_size = { 360.f, 75.f };
                 sf::Vector2f center = { 425.f, 450.f };
                 sf::Vector2f step = { 0.f, 105.f };
 
                 Button btn_PvP(btn_size, sf::Color(5, 89, 250, 1), sf::Color::Black);
-                btn_PvP.setOrigin({ btn_size.x/2, btn_size.y/2 });
+                btn_PvP.setOrigin({ btn_size.x / 2, btn_size.y / 2 });
                 btn_PvP.setPosition(center);
                 btn_PvP.drawTo(window);
 
@@ -46,7 +46,7 @@ int main()
             }
             case static_cast<int>(screens::BattleField):
             {
-                
+
                 BattleCell testBattleField[10][10];
                 float positionX = 175;
                 float positionY = 175;
@@ -141,6 +141,8 @@ int main()
                         }
                     }
                     window.clear();
+                }
+            }
             }
 
             //close Event
@@ -150,6 +152,8 @@ int main()
             //refresh window
             window.display();
             window.clear(sf::Color::Black);
+        }
+
     }
 
 }
