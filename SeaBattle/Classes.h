@@ -1,6 +1,84 @@
 #pragma once
+#include <iostream>
 #include <SFML/Graphics.hpp>
-#define MAX_MENU_TILES 3
+
+class BattleCell {
+public:
+    BattleCell() = default;
+    //cunstructor of the btn setting initial size, background color and outline color
+    BattleCell(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor, int index)
+        : index(index)
+    {
+        button.setSize(size);
+        button.setFillColor(bgColor);
+        button.setOutlineColor(olColor);
+        button.setOutlineThickness(1.f);
+    }
+
+    //setting the button background color
+    void setBackColor(sf::Color color)
+    {
+        button.setFillColor(color);
+    }
+
+    //setting the button outline color
+    void setLineColor(sf::Color color)
+    {
+        button.setOutlineColor(color);
+    }
+
+    //setting the position of the button
+    void setPosition(sf::Vector2f pos)
+    {
+        button.setPosition(pos);
+
+        float xPos = (pos.x + button.getSize().x / 2);
+        float yPos = (pos.y + button.getSize().y / 2);
+    }
+
+    void setOrigin(sf::Vector2f pos)
+    {
+        button.setOrigin(pos);
+    }
+
+    //funtion to draw button
+    void drawTo(sf::RenderWindow& window)
+    {
+        window.draw(button);
+    }
+
+    //check if mouse is over the button
+    bool isMouseOver(sf::RenderWindow& window)
+    {
+        int mouseX = sf::Mouse::getPosition(window).x;
+        int mouseY = sf::Mouse::getPosition(window).y;
+
+        float btnPosX = button.getPosition().x;
+        float btnPosY = button.getPosition().y;
+
+        float btnxPosWidth = button.getPosition().x + button.getSize().x;
+        float btnyPosWidth = button.getPosition().y + button.getSize().y;
+
+        if (mouseX < btnxPosWidth && mouseX > btnPosX && mouseY < btnyPosWidth && mouseY > btnPosY)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    void setIndex(int newIndex)
+    {
+        index = newIndex;
+    }
+
+    int getIndex() const
+    {
+        return index;
+    }
+private:
+    sf::RectangleShape button;
+    int index;
+};
 
 class Button {
 public:
@@ -18,7 +96,7 @@ public:
     {
         button.setFillColor(color);
     }
-    
+
     //setting the button outline color
     void setLineColor(sf::Color color)
     {
@@ -32,6 +110,11 @@ public:
 
         float xPos = (pos.x + button.getSize().x / 2); //NOTE: Why? For what purpose?
         float yPos = (pos.y + button.getSize().y / 2);
+    }
+
+    void setOrigin(sf::Vector2f pos)
+    {
+        button.setOrigin(pos);
     }
 
     //funtion to draw button
@@ -59,26 +142,11 @@ public:
         return false;
     }
 private:
-	sf::RectangleShape button;
+    sf::RectangleShape button;
 };
 
-class Main_menu {
-private:
-    int Selected{}; //selected tile
-    sf::Font arial; //font
-    sf::Text Tiles[MAX_MENU_TILES]; //array of tiles
-public:
-    //construct of Menu
-    Main_menu(float width, float height)
-    {
-        arial.openFromFile("FONTS/arialmt.ttf");
-
-    }
-    //function to draw Menu 
-    void drawTo(sf::RenderWindow& window)
-    {
-        for (int i{}; i < MAX_MENU_TILES; i++)
-            //window.draw(Tiles[i]);
-            i++;
-    }
+enum class screens {
+    MainMenu,
+    BattleField,
+    EndGame
 };
