@@ -143,7 +143,7 @@ int main()
             }
         }
         window.clear();
-
+        //help
         if (screen == static_cast<int>(screens::MainMenu))
         {
             window.draw(bg_sprite);
