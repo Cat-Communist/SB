@@ -8,6 +8,23 @@ sf::Font arial("FONTS/arialmt.ttf");
 int main()
 {
     sf::RenderWindow window(sf::VideoMode({ 850, 900 }), "SeaBattle");
+    BattleCell testBattleField[10][10];
+    float positionX = 175;
+    float positionY = 175;
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            testBattleField[i][j] = BattleCell({ 49, 49 }, sf::Color::Black, sf::Color::White, 0);
+        }
+    }
+    for (int i = 0; i < 10; ++i) {
+        positionX = 175;
+        for (int j = 0; j < 10; ++j) {
+            testBattleField[i][j].setPosition({ positionX, positionY });
+            positionX = positionX + 50;
+        }
+        positionY = positionY + 50;
+    }
+    positionY = 175;
     while (window.isOpen())
     {
         //TODO: Events onMouseClick on different items of menu (screen must be changed then)
@@ -89,28 +106,12 @@ int main()
                 window.draw(txt_PvE);
                 window.draw(txt_Exit);
 
+                window.display();
+
                 break;
             }
             case static_cast<int>(screens::BattleField):
             {
-
-                BattleCell testBattleField[10][10];
-                float positionX = 175;
-                float positionY = 175;
-                for (int i = 0; i < 10; ++i) {
-                    for (int j = 0; j < 10; ++j) {
-                        testBattleField[i][j] = BattleCell({ 49, 49 }, sf::Color::Black, sf::Color::White, 0);
-                    }
-                }
-                for (int i = 0; i < 10; ++i) {
-                    positionX = 175;
-                    for (int j = 0; j < 10; ++j) {
-                        testBattleField[i][j].setPosition({ positionX, positionY });
-                        positionX = positionX + 50;
-                    }
-                    positionY = positionY + 50;
-                }
-
                 if (event->is<sf::Event::MouseMoved>())
                 {
                     for (int i = 0; i < 10; ++i) {
@@ -146,22 +147,18 @@ int main()
                         }
                     }
                 }
+                window.clear();
                 for (int i = 0; i < 10; ++i) {
                     for (int j = 0; j < 10; ++j) {
                         testBattleField[i][j].drawTo(window);
                     }
                 }
+                window.display();
             }
             }
-
             //close Event
             if (event->is<sf::Event::Closed>())
                 window.close();
-
-
-            //refresh window
-            window.display();
-            window.clear();
         }
 
     }
