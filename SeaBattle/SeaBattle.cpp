@@ -77,7 +77,7 @@ int main()
                 txt_Exit.setFillColor(sf::Color::Black);
                 txt_Exit.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
                 txt_Exit.setPosition(center + step + step);
-
+                
                 //handle events onMouse
                 if (btn_PvP.isMouseOver(window)) {
                     btn_PvP.setBackColor(sf::Color(btn_col_dark));
