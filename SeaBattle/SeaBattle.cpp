@@ -1,4 +1,4 @@
-﻿#include "Classes.h"
+#include "Classes.h"
 #include <iostream>
 
 
@@ -8,7 +8,6 @@ sf::Font arial("FONTS/arialmt.ttf");
 int main()
 {
     sf::RenderWindow window(sf::VideoMode({ 850, 900 }), "SeaBattle");
-    window.setVerticalSyncEnabled(true);
     BattleCell testBattleField[10][10];
     float positionX = 175;
     float positionY = 175;
@@ -140,6 +139,13 @@ int main()
                     }
                     break;
                 }
+                window.clear();
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        testBattleField[i][j].drawTo(window);
+                    }
+                }
+                window.display();
             }
         }
         window.clear();
