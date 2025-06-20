@@ -157,6 +157,7 @@ private:
 
 enum class screens {
     MainMenu,
-    BattleField,
+    BattleFieldPlayer1,
+    BattleFieldPlayer2,
     EndGame
 };
