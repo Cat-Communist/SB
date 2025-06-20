@@ -112,9 +112,19 @@ public:
         float yPos = (pos.y + button.getSize().y / 2);
     }
 
+    sf::Vector2f getPosition()
+    {
+        return button.getPosition();
+    }
+
     void setOrigin(sf::Vector2f pos)
     {
         button.setOrigin(pos);
+    }
+
+    void invertBgCol(sf::Color BgColor)
+    {
+        button.setFillColor(sf::Color(255 - BgColor.r, 255 - BgColor.g, 255 - BgColor.b));
     }
 
     //funtion to draw button
@@ -129,11 +139,11 @@ public:
         int mouseX = sf::Mouse::getPosition(window).x;
         int mouseY = sf::Mouse::getPosition(window).y;
 
-        float btnPosX = button.getPosition().x;
-        float btnPosY = button.getPosition().y;
+        float btnPosX = button.getPosition().x - button.getSize().x / 2;
+        float btnPosY = button.getPosition().y - button.getSize().y / 2;
 
-        float btnxPosWidth = button.getPosition().x + button.getSize().x;
-        float btnyPosWidth = button.getPosition().y + button.getSize().y;
+        float btnxPosWidth = btnPosX + button.getSize().x;
+        float btnyPosWidth = btnPosY + button.getSize().y;
 
         if (mouseX < btnxPosWidth && mouseX > btnPosX && mouseY < btnyPosWidth && mouseY > btnPosY)
         {
