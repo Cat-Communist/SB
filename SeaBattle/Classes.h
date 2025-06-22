@@ -2,10 +2,180 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+class Mouse
+{
+public:
+    //mouse position
+    float x, y;
+
+    //states
+    bool left_click;
+    bool right_click;
+    bool leftPress;
+    bool leftRelease;
+    bool rightPress;
+    bool rightRelease;
+
+public:
+    void Update(sf::RenderWindow& window)
+    {
+
+        //reset states
+        leftPress = false;
+        leftRelease = false;
+        rightPress = false;
+        rightRelease = false;
+
+        x = sf::Mouse::getPosition(window).x;
+        y = sf::Mouse::getPosition(window).y;
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            if (!left_click)
+                leftPress = true;
+            left_click = true;
+        }
+        else
+        {
+            if (left_click)
+                leftRelease = true;
+            left_click = false;
+        }
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+        {
+            if (!right_click)
+                rightPress = true;
+            right_click = true;
+        }
+        else
+        {
+            if (right_click)
+                rightRelease = true;
+            right_click = false;
+        }
+
+    }
+};
+
+class Ship
+{
+public:
+    //position 
+    float x = 0.f;
+    float y = 0.f;
+
+    //size
+    int decks; //amount of cells
+    int height = 1;
+    float cell = 50.f; //one cell size
+
+    //offsets
+    float offset_x = 0.f;
+    float offset_y = 0.f;
+
+    //states
+    bool isDragged = false;
+    bool wasClicked = false;
+
+    //decor
+    sf::Color color;
+private:
+    sf::RectangleShape rect;
+public:
+    //constructor
+    Ship(int decks, sf::Vector2f pos, sf::Color col)
+        : decks(decks), x(pos.x), y(pos.y), color(col)
+    {
+        rect.setSize({ decks * cell, height * cell });
+        rect.setFillColor(color);
+        rect.setPosition({x, y});
+    }
+
+    bool isInside(float x, float y)
+    {
+        if (x > this->x && x < this->x + decks * cell
+            && y > this->y && y < this->y + height * cell)
+            return true;
+        return false;
+    }
+
+    //makes shape draggable
+    void Draggable(Mouse& mouse)
+    {
+        if (mouse.leftPress && isInside(mouse.x, mouse.y))
+        {
+            offset_x = mouse.x - x;
+            offset_y = mouse.y - y;
+
+            isDragged = true;
+        }
+        else if (mouse.leftRelease)
+            isDragged = false;
+        if (isDragged)
+        {
+            x = mouse.x - offset_x;
+            y = mouse.y - offset_y;
+        }
+    }
+
+    //draws shape and refreshes its position 
+    void Draw(sf::RenderWindow& window)
+    {
+        rect.setSize({ decks * cell, height * cell });
+        rect.setFillColor(color);
+        rect.setPosition({ x,y });
+        window.draw(rect);
+    }
+
+    //swaps sides of a shape
+    void swapSides(int& w, int& h)
+    {
+        int temp = w;
+        w = h;
+        h = temp;
+    }
+
+    //makes shape rotatable
+    void Rotatable(Mouse& mouse)
+    {
+        if (wasClicked)
+        {
+            swapSides(decks, height);
+            wasClicked = false;
+        }
+        if (mouse.rightRelease && isInside(mouse.x, mouse.y))
+        {
+            swapSides(decks, height);
+        }
+    }
+
+    //gets origin of shape
+    sf::Vector2f getOrigin()
+    {
+        return rect.getOrigin();
+    }
+
+    //sets position of shape
+    void setPosition(sf::Vector2f pos)
+    {
+        x = pos.x;
+        y = pos.y;
+    }
+};
+
+
 class BattleCell {
 public:
+    //position
+    float x = 0.f;
+    float y = 0.f;
+
+    //size of button
+    int button_size = 50.f;
+public:
     BattleCell() = default;
-    //cunstructor of the btn setting initial size, background color and outline color
+    //cunstructor of the battlecel, setting initial size, background color and outline color
     BattleCell(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor, int index)
         : index(index)
     {
@@ -31,14 +201,18 @@ public:
     void setPosition(sf::Vector2f pos)
     {
         button.setPosition(pos);
-
-        float xPos = (pos.x + button.getSize().x / 2);
-        float yPos = (pos.y + button.getSize().y / 2);
+        x = pos.x;
+        y = pos.y;
     }
 
     void setOrigin(sf::Vector2f pos)
     {
         button.setOrigin(pos);
+    }
+
+    sf::Vector2f getPosition()
+    {
+        return button.getPosition();
     }
 
     //funtion to draw button
@@ -74,6 +248,36 @@ public:
     int getIndex() const
     {
         return index;
+    }
+
+    bool MouseisInside(float x, float y)
+    {
+        if (x > this->x && x < this->x + button_size
+            && y > this->y && y < this->y + button_size)
+        {
+            return true;
+        }
+        return false;
+    }
+    void Alignbutton(Mouse& mouse, Ship& rect)
+    {
+        if (rect.isDragged && MouseisInside(mouse.x, mouse.y))
+        {
+            if (rect.wasClicked)
+            {
+                rect.setPosition(button.getPosition() - sf::Vector2f{ 0, floor(rect.offset_y / 50) * button_size });
+            }
+            else
+                rect.setPosition(button.getPosition() - sf::Vector2f{ floor(rect.offset_x / 50) * button_size, 0 });
+        }
+    }
+
+    bool ShipisOn(Ship rect)
+    {
+        if (button.getPosition().x >= rect.x && button.getPosition().x < rect.x + rect.decks * rect.cell
+            && button.getPosition().y >= rect.y && button.getPosition().y < rect.y + rect.height * rect.cell)
+            return true;
+        return false;
     }
 private:
     sf::RectangleShape button;
@@ -122,11 +326,6 @@ public:
         button.setOrigin(pos);
     }
 
-    void invertBgCol(sf::Color BgColor)
-    {
-        button.setFillColor(sf::Color(255 - BgColor.r, 255 - BgColor.g, 255 - BgColor.b));
-    }
-
     //funtion to draw button
     void drawTo(sf::RenderWindow& window)
     {
@@ -157,6 +356,14 @@ private:
 
 enum class screens {
     MainMenu,
+    SettingShips,
     BattleField,
     EndGame
+};
+
+enum class list_of_ships {
+    four,
+    three,
+    two,
+    one
 };
