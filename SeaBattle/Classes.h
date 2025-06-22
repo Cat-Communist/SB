@@ -287,6 +287,7 @@ private:
 class Button {
 public:
     //cunstructor of the btn setting initial size, background color and outline color
+    Button() = default;
     Button(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor)
     {
         button.setSize(size);
@@ -356,8 +357,10 @@ private:
 
 enum class screens {
     MainMenu,
-    SettingShips,
-    BattleField,
+    FieldPlayer1,
+    FieldPlayer2,
+    BattlePlayer1,
+    BattlePlayer2,
     EndGame
 };
 
