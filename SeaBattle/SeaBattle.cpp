@@ -8,7 +8,7 @@ sf::Font arial("FONTS/arialmt.ttf");
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({ 850, 900 }), "SeaBattle");
+    sf::RenderWindow window(sf::VideoMode({ 900, 950 }), "SeaBattle");
     Mouse mouse;
     //ships:
     //player 1
@@ -21,7 +21,7 @@ int main()
     Ship two_deck1P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck2P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck3P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //trhre-deck
+    //three-deck
     Ship three_deck1P1(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship three_deck2P1(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     //four-deck
@@ -36,7 +36,7 @@ int main()
     Ship two_deck1P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck2P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck3P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //trhre-deck
+    //three-deck
     Ship three_deck1P2(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship three_deck2P2(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     //four-deck
@@ -154,7 +154,7 @@ int main()
     bg_sprite.scale({ 5, 5.5 });
 
     sf::Vector2f btn_size  = { 360.f, 75.f };
-    sf::Vector2f center    = { 425.f, 450.f };
+    sf::Vector2f center    = { 450.f, 475.f };
     sf::Vector2f step      = { 0.f, 105.f };
     sf::Color btn_col_reg  = sf::Color(5, 89, 250, 120);
     sf::Color btn_col_dark = sf::Color(5, 89, 250, 160);
@@ -314,43 +314,7 @@ int main()
                         //TODO: function that puts ships in random places and insert it here
                     }
                     else
-                        btn_randomPlacing.setBackColor(sf::Color());
-
-                    if (event->is<sf::Event::MouseMoved>())
-                    {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player2Field[i][j].isMouseOver(window) && player2Field[i][j].getIndex() == 0)
-                                {
-                                    player2Field[i][j].setBackColor(sf::Color::White);
-                                }
-                                else if (player2Field[i][j].getIndex() == 0)
-                                {
-                                    player2Field[i][j].setBackColor(sf::Color::Black);
-                                }
-                            }
-                        }
-                    }
-                    if (event->is<sf::Event::MouseButtonPressed>())
-                    {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player2Field[i][j].isMouseOver(window))
-                                {
-                                    if (player2Field[i][j].getIndex() == 1)
-                                    {
-                                        player2Field[i][j].setIndex(0);
-                                        player2Field[i][j].setBackColor(sf::Color::Black);
-                                    }
-                                    else
-                                    {
-                                        player2Field[i][j].setIndex(1);
-                                        player2Field[i][j].setBackColor(sf::Color::Red);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                        btn_randomPlacing.setBackColor(sf::Color()); 
                     break;
                 }
                 case static_cast<int>(screens::BattlePlayer1):// Поле Игрока 1 этапа "Бой"
@@ -606,91 +570,91 @@ int main()
             {
                 for (int j{}; j < 10; j++)
                 {
-                    player1Field[i][j].Alignbutton(mouse, one_deck1P2);
-                    player1Field[i][j].Alignbutton(mouse, one_deck2P2);
-                    player1Field[i][j].Alignbutton(mouse, one_deck3P2);
-                    player1Field[i][j].Alignbutton(mouse, one_deck4P2);
+                    player2Field[i][j].Alignbutton(mouse, one_deck1P2);
+                    player2Field[i][j].Alignbutton(mouse, one_deck2P2);
+                    player2Field[i][j].Alignbutton(mouse, one_deck3P2);
+                    player2Field[i][j].Alignbutton(mouse, one_deck4P2);
 
-                    player1Field[i][j].Alignbutton(mouse, two_deck1P2);
-                    player1Field[i][j].Alignbutton(mouse, two_deck2P2);
-                    player1Field[i][j].Alignbutton(mouse, two_deck3P2);
+                    player2Field[i][j].Alignbutton(mouse, two_deck1P2);
+                    player2Field[i][j].Alignbutton(mouse, two_deck2P2);
+                    player2Field[i][j].Alignbutton(mouse, two_deck3P2);
 
-                    player1Field[i][j].Alignbutton(mouse, three_deck1P2);
-                    player1Field[i][j].Alignbutton(mouse, three_deck2P2);
+                    player2Field[i][j].Alignbutton(mouse, three_deck1P2);
+                    player2Field[i][j].Alignbutton(mouse, three_deck2P2);
 
-                    player1Field[i][j].Alignbutton(mouse, four_deckP2);
-                    player1Field[i][j].drawTo(window);
+                    player2Field[i][j].Alignbutton(mouse, four_deckP2);
+                    player2Field[i][j].drawTo(window);
                     //1 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck1P2))
+                    if (player2Field[i][j].ShipisOn(one_deck1P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //2 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck2P2))
+                    if (player2Field[i][j].ShipisOn(one_deck2P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //3 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck3P2))
+                    if (player2Field[i][j].ShipisOn(one_deck3P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //4 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck4P2))
+                    if (player2Field[i][j].ShipisOn(one_deck4P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //1 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck1P2))
+                    if (player2Field[i][j].ShipisOn(two_deck1P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //2 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck2P2))
+                    if (player2Field[i][j].ShipisOn(two_deck2P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //3 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck3P2))
+                    if (player2Field[i][j].ShipisOn(two_deck3P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //1 three-deck
-                    if (player1Field[i][j].ShipisOn(three_deck1P2))
+                    if (player2Field[i][j].ShipisOn(three_deck1P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
                     //2 three-deck
-                    if (player1Field[i][j].ShipisOn(three_deck2P2))
+                    if (player2Field[i][j].ShipisOn(three_deck2P2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
 
                     //1 four-deck
-                    if (player1Field[i][j].ShipisOn(four_deckP2))
+                    if (player2Field[i][j].ShipisOn(four_deckP2))
                     {
-                        player1Field[i][j].setIndex(1); continue;
+                        player2Field[i][j].setIndex(1); continue;
                     }
                     else
-                        player1Field[i][j].setIndex(0);
+                        player2Field[i][j].setIndex(0);
 
                 }
             }
