@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "ScreenState.h"
 
 class Mouse
 {
@@ -56,6 +57,16 @@ public:
         }
 
     }
+
+    void Reset() {
+        x = y = -1000;
+        left_click = false;
+        right_click = false;
+        leftPress = false;
+        leftRelease = false;
+        rightPress = false;
+        rightRelease = false;
+    }
 };
 
 class Ship
@@ -90,6 +101,10 @@ public:
         rect.setSize({ decks * cell, height * cell });
         rect.setFillColor(color);
         rect.setPosition({x, y});
+    }
+
+    sf::Vector2f getPosition() const {
+        return sf::Vector2f(x, y);
     }
 
     bool isInside(float x, float y)
@@ -137,15 +152,25 @@ public:
     }
 
     //makes shape rotatable
-    void Rotatable(Mouse& mouse)
-    {
-        if (wasClicked)
-        {
+    void Rotatable(Mouse& mouse, screens currentScreen) {
+        // “олько на экранах расстановки
+        if (currentScreen != screens::FieldPlayer1 &&
+            currentScreen != screens::FieldPlayer2) {
+            return;
+        }
+
+        // »гнорируем событи€, если корабль не виден
+        if (getPosition().x < 0 || getPosition().y < 0) {
+            return;
+        }
+
+        if (wasClicked) {
             swapSides(decks, height);
             wasClicked = false;
         }
-        if (mouse.rightRelease && isInside(mouse.x, mouse.y))
-        {
+
+        // ѕоворачиваем только если корабль не перетаскиваетс€ в данный момент
+        if (!isDragged && mouse.rightRelease && isInside(mouse.x, mouse.y)) {
             swapSides(decks, height);
         }
     }
@@ -189,6 +214,10 @@ public:
     void setBackColor(sf::Color color)
     {
         button.setFillColor(color);
+    }
+
+    sf::Color getBackColor() const {
+        return button.getFillColor();
     }
 
     //setting the button outline color
@@ -353,15 +382,6 @@ public:
     }
 private:
     sf::RectangleShape button;
-};
-
-enum class screens {
-    MainMenu,
-    FieldPlayer1,
-    FieldPlayer2,
-    BattlePlayer1,
-    BattlePlayer2,
-    EndGame
 };
 
 enum class list_of_ships {

@@ -1,10 +1,20 @@
 #include "Classes.h"
+#include "ScreenState.h"
 #include <iostream>
+#include <string>
 
 //presets
-int screen = static_cast<int>(screens::MainMenu); 
+screens screen = screens::MainMenu;
 int curShip = static_cast<int>(list_of_ships::four);
 sf::Font arial("FONTS/arialmt.ttf");
+
+void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]) {
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            target[i][j].setIndex(source[i][j].getIndex());
+        }
+    }
+}
 
 int main()
 {
@@ -53,8 +63,7 @@ int main()
     // Координаты
     for (int i = 0; i < 10; ++i) {
         coordinateLetters[i] = Button({ 50, 50 }, sf::Color(25, 25, 25), sf::Color::White);
-        coordinateLetters[i].setPosition({positionX, 175});
-
+        coordinateLetters[i].setPosition({ positionX, 175});
         positionX = positionX + 50;
     }
     positionX = 225;
@@ -107,6 +116,22 @@ int main()
         positionX = 225;
         for (int j = 0; j < 10; ++j) {
             player1BattleField[i][j].setPosition({ positionX, positionY });
+            positionX = positionX + 50;
+        }
+        positionY = positionY + 50;
+    }
+    positionY = 225;
+    positionX = 225;
+
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            player2BattleField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
+        }
+    }
+    for (int i = 0; i < 10; ++i) {
+        positionX = 225;
+        for (int j = 0; j < 10; ++j) {
+            player2BattleField[i][j].setPosition({ positionX, positionY });
             positionX = positionX + 50;
         }
         positionY = positionY + 50;
@@ -226,27 +251,81 @@ int main()
     txt_randomPlacing.setPosition({ 450, 800 });
 
     //text for coordinates
-    sf::Text txt_coordinates(arial);
-    txt_coordinates.setString("ABCDEFGHIJ");
-    txt_coordinates.setFillColor(sf::Color::White);
-    txt_coordinates.setPosition({ 225, 225 });
+    std::vector<sf::Text> letters;
+    positionX = 290;
+    for (int i = 0; i < 10; i++) {
+        sf::Text text(arial);
+        text.setString(std::string(1, 'A' + i));
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color::White);
+        sf::FloatRect bounds = text.getLocalBounds();
+        text.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+        text.setPosition({ positionX, 185 });
+        letters.push_back(text);
+        positionX = positionX + 50;
+    }
+    positionX = 225;
+
+    std::vector<sf::Text> numbers;
+    positionY = 235;
+    for (int i = 0; i < 9; i++) {
+        sf::Text text(arial);
+        text.setString(std::string(1, '1' + i));
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color::White);
+        sf::FloatRect bounds = text.getLocalBounds();
+        text.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+        text.setPosition({ 240, positionY });
+        numbers.push_back(text);
+        positionY = positionY + 50;
+    }
+    sf::Text text(arial);
+    text.setString(std::string(1, '0'));
+    text.setCharacterSize(50);
+    text.setFillColor(sf::Color::White);
+    sf::FloatRect bounds = text.getLocalBounds();
+    text.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    text.setPosition({ 240, positionY });
+    numbers.push_back(text);
+    positionY = 225;
+
+    sf::Text txt_player(arial);
+    txt_player.setString("Player 1");
+    txt_player.setFillColor(sf::Color::White);
+    txt_player.setPosition({ 10, 10 });
+
+    sf::Text txt_placingText(arial);
+    txt_placingText.setString("place your's ships.");
+    txt_placingText.setFillColor(sf::Color::White);
+    txt_placingText.setPosition({ 128, 10 });
+
+    sf::Text txt_turn(arial);
+    int turnNumber = 1;
+    txt_turn.setString("Turn " + std::to_string(turnNumber));
+    txt_bounds = txt_turn.getGlobalBounds();
+    txt_turn.setOrigin({ txt_bounds.getCenter().x * 2, 0 });
+    txt_turn.setFillColor(sf::Color::White);
+    txt_turn.setPosition({ 870, 10 });
 
     while (window.isOpen())
     {
-
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
                 window.close();
             switch (screen)
             {
-                case static_cast<int>(screens::MainMenu):
+                case screens::MainMenu:
                 {
                     //handle events onMouse
+                    PvE = false;
+                    turnNumber = 1;
+                    txt_turn.setString("Turn " + std::to_string(turnNumber));
                     if (btn_PvP.isMouseOver(window)) {
                         btn_PvP.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
-                            screen = static_cast<int>(screens::FieldPlayer1);
+                            mouse.Reset();
+                            screen = screens::FieldPlayer1;
                         }
                     }
                     else {
@@ -256,7 +335,8 @@ int main()
                     if (btn_PvE.isMouseOver(window)) {
                         btn_PvE.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
-                            screen = static_cast<int>(screens::FieldPlayer1);
+                            mouse.Reset();
+                            screen = screens::FieldPlayer1;
                             PvE = true;
                         }
                     }
@@ -276,15 +356,17 @@ int main()
 
                     break;
                 }
-                case static_cast<int>(screens::FieldPlayer1):// Поле Игрока 1 этапа "Расстановка"
+                case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
                 {
+                    txt_player.setString("Player 1");
                     if (btn_endPlacingP1.isMouseOver(window)) {
                         btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
+                            copyFieldToBattleField(player1Field, player2BattleField);
                             if (PvE)
-                                screen = static_cast<int>(screens::BattlePlayer1);
+                                screen = screens::BattlePlayer1;
                             else
-                                screen = static_cast<int>(screens::FieldPlayer2);
+                                screen = screens::FieldPlayer2;
                         }
                     }
                     else
@@ -298,12 +380,14 @@ int main()
                         btn_randomPlacing.setBackColor(sf::Color());
                     break;
                 }
-                case static_cast<int>(screens::FieldPlayer2):// Поле Игрока 2 этапа "Расстановка"
+                case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
                 {
+                    txt_player.setString("Player 2");
                     if (btn_endPlacingP2.isMouseOver(window)) {
                         btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
-                            screen = static_cast<int>(screens::BattlePlayer1);
+                            copyFieldToBattleField(player2Field, player1BattleField);
+                            screen = screens::BattlePlayer1;
                         }
                     }
                     else
@@ -317,19 +401,22 @@ int main()
                         btn_randomPlacing.setBackColor(sf::Color()); 
                     break;
                 }
-                case static_cast<int>(screens::BattlePlayer1):// Поле Игрока 1 этапа "Бой"
+                case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
                 {
+                    txt_turn.setString("Turn " + std::to_string(turnNumber));
+                    txt_player.setString("Player 1");
                     if (event->is<sf::Event::MouseMoved>())
                     {
                         for (int i = 0; i < 10; ++i) {
                             for (int j = 0; j < 10; ++j) {
-                                if (player1BattleField[i][j].isMouseOver(window) && player1BattleField[i][j].getIndex() == 0)
-                                {
-                                    player1BattleField[i][j].setBackColor(sf::Color::White);
-                                }
-                                else if (player1BattleField[i][j].getIndex() == 0)
+                                if (player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
                                 {
                                     player1BattleField[i][j].setBackColor(sf::Color::Black);
+                                }
+                                if (player1BattleField[i][j].isMouseOver(window) &&
+                                    player1BattleField[i][j].getBackColor() == sf::Color::Black)
+                                {
+                                    player1BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
                                 }
                             }
                         }
@@ -338,17 +425,56 @@ int main()
                     {
                         for (int i = 0; i < 10; ++i) {
                             for (int j = 0; j < 10; ++j) {
-                                if (player1BattleField[i][j].isMouseOver(window))
+                                if (player1BattleField[i][j].isMouseOver(window) && player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
                                 {
-                                    if (player1BattleField[i][j].getIndex() == 1)
+                                    if (player1BattleField[i][j].getIndex() == 1) {
+                                        player1BattleField[i][j].setBackColor(sf::Color::Red);
+                                    }
+                                    else {
+                                        player1BattleField[i][j].setBackColor(sf::Color::White);
+                                        screen = screens::BattlePlayer2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
+                {
+                    txt_turn.setString("Turn " + std::to_string(turnNumber));
+                    txt_player.setString("Player 2");
+                    if (event->is<sf::Event::MouseMoved>())
+                    {
+                        for (int i = 0; i < 10; ++i) {
+                            for (int j = 0; j < 10; ++j) {
+                                if (player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                                {
+                                    player2BattleField[i][j].setBackColor(sf::Color::Black);
+                                }
+                                if (player2BattleField[i][j].isMouseOver(window) &&
+                                    player2BattleField[i][j].getBackColor() == sf::Color::Black)
+                                {
+                                    player2BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
+                                }
+                            }
+                        }
+                    }
+                    if (event->is<sf::Event::MouseButtonPressed>())
+                    {
+                        for (int i = 0; i < 10; ++i) {
+                            for (int j = 0; j < 10; ++j) {
+                                if (player2BattleField[i][j].isMouseOver(window) && player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                                {
+                                    if (player2BattleField[i][j].getIndex() == 1)
                                     {
-                                        player1BattleField[i][j].setIndex(0);
-                                        player1BattleField[i][j].setBackColor(sf::Color::Black);
+                                        player2BattleField[i][j].setBackColor(sf::Color::Red);
                                     }
                                     else
                                     {
-                                        player1BattleField[i][j].setIndex(1);
-                                        player1BattleField[i][j].setBackColor(sf::Color::Red);
+                                        player2BattleField[i][j].setBackColor(sf::Color::White);
+                                        screen = screens::BattlePlayer1;
+                                        turnNumber++;
                                     }
                                 }
                             }
@@ -359,7 +485,7 @@ int main()
             }
         }
         window.clear();
-        if (screen == static_cast<int>(screens::MainMenu))
+        if (screen == screens::MainMenu)
         {
             window.draw(bg_sprite);
             btn_PvP.drawTo(window);
@@ -370,49 +496,53 @@ int main()
             window.draw(txt_Exit);
         }
 
-        if (screen == static_cast<int>(screens::FieldPlayer1))
+        if (screen == screens::FieldPlayer1)
         {
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
+            if (!PvE)
+            {
+                window.draw(txt_player);
+                window.draw(txt_placingText);
             }
             btn_endPlacingP1.drawTo(window);
             window.draw(txt_endPlacingP1);
             btn_randomPlacing.drawTo(window);
             window.draw(txt_randomPlacing);
             for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player1Field[i][j].drawTo(window);
                 }
             }
-            window.draw(txt_coordinates);
 
             //update mouse
             mouse.Update(window);
             //update ships
             one_deck1P1.Draggable(mouse);
-            one_deck1P1.Rotatable(mouse);
+            one_deck1P1.Rotatable(mouse, screen);
             one_deck2P1.Draggable(mouse);
-            one_deck2P1.Rotatable(mouse);
+            one_deck2P1.Rotatable(mouse, screen);
             one_deck3P1.Draggable(mouse);
-            one_deck3P1.Rotatable(mouse);
+            one_deck3P1.Rotatable(mouse, screen);
             one_deck4P1.Draggable(mouse);
-            one_deck4P1.Rotatable(mouse);
+            one_deck4P1.Rotatable(mouse, screen);
 
             two_deck1P1.Draggable(mouse);
-            two_deck1P1.Rotatable(mouse);
+            two_deck1P1.Rotatable(mouse, screen);
             two_deck2P1.Draggable(mouse);
-            two_deck2P1.Rotatable(mouse);
+            two_deck2P1.Rotatable(mouse, screen);
             two_deck3P1.Draggable(mouse);
-            two_deck3P1.Rotatable(mouse);
+            two_deck3P1.Rotatable(mouse, screen);
 
             three_deck1P1.Draggable(mouse);
-            three_deck1P1.Rotatable(mouse);
+            three_deck1P1.Rotatable(mouse, screen);
             three_deck2P1.Draggable(mouse);
-            three_deck2P1.Rotatable(mouse);
+            three_deck2P1.Rotatable(mouse, screen);
 
             four_deckP1.Draggable(mouse);
-            four_deckP1.Rotatable(mouse);
+            four_deckP1.Rotatable(mouse, screen);
 
             for (int i{}; i < 10; i++)
             {
@@ -522,17 +652,19 @@ int main()
             four_deckP1.Draw(window);
         }
         
-        if (screen == static_cast<int>(screens::FieldPlayer2))
+        if (screen == screens::FieldPlayer2)
         {
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-            }
+            window.draw(txt_player);
+            window.draw(txt_placingText);
             btn_endPlacingP2.drawTo(window);
             window.draw(txt_endPlacingP2);
             btn_randomPlacing.drawTo(window);
             window.draw(txt_randomPlacing);
             for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player2Field[i][j].drawTo(window);
                 }
@@ -543,28 +675,28 @@ int main()
             mouse.Update(window);
             //update ships
             one_deck1P2.Draggable(mouse);
-            one_deck1P2.Rotatable(mouse);
+            one_deck1P2.Rotatable(mouse, screen);
             one_deck2P2.Draggable(mouse);
-            one_deck2P2.Rotatable(mouse);
+            one_deck2P2.Rotatable(mouse, screen);
             one_deck3P2.Draggable(mouse);
-            one_deck3P2.Rotatable(mouse);
+            one_deck3P2.Rotatable(mouse, screen);
             one_deck4P2.Draggable(mouse);
-            one_deck4P2.Rotatable(mouse);
+            one_deck4P2.Rotatable(mouse, screen);
 
             two_deck1P2.Draggable(mouse);
-            two_deck1P2.Rotatable(mouse);
+            two_deck1P2.Rotatable(mouse, screen);
             two_deck2P2.Draggable(mouse);
-            two_deck2P2.Rotatable(mouse);
+            two_deck2P2.Rotatable(mouse, screen);
             two_deck3P2.Draggable(mouse);
-            two_deck3P2.Rotatable(mouse);
+            two_deck3P2.Rotatable(mouse, screen);
 
             three_deck1P2.Draggable(mouse);
-            three_deck1P2.Rotatable(mouse);
+            three_deck1P2.Rotatable(mouse, screen);
             three_deck2P2.Draggable(mouse);
-            three_deck2P2.Rotatable(mouse);
+            three_deck2P2.Rotatable(mouse, screen);
 
             four_deckP2.Draggable(mouse);
-            four_deckP2.Rotatable(mouse);
+            four_deckP2.Rotatable(mouse, screen);
 
             for (int i{}; i < 10; i++)
             {
@@ -673,15 +805,35 @@ int main()
 
             four_deckP2.Draw(window);
         }
-        if (screen == static_cast<int>(screens::BattlePlayer1))
+        if (screen == screens::BattlePlayer1)
         {
+            if (!PvE)
+            {
+                window.draw(txt_player);
+            }
+            window.draw(txt_turn);
+            
             for (int i = 0; i < 10; ++i) {
                 coordinateLetters[i].drawTo(window);
                 coordinateNumbers[i].drawTo(window);
-            }
-            for (int i = 0; i < 10; ++i) {
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player1BattleField[i][j].drawTo(window);
+                }
+            }
+        }
+        if (screen == screens::BattlePlayer2)
+        {
+            window.draw(txt_player);
+            window.draw(txt_turn);
+            for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
+                for (int j = 0; j < 10; ++j) {
+                    player2BattleField[i][j].drawTo(window);
                 }
             }
         }
