@@ -5,7 +5,6 @@
 
 //presets
 screens screen = screens::MainMenu;
-int curShip = static_cast<int>(list_of_ships::four);
 sf::Font arial("FONTS/arialmt.ttf");
 
 void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]) {
@@ -328,7 +327,7 @@ int main()
     txt_player.setPosition({ 10, 10 });
 
     sf::Text txt_placingText(arial);
-    txt_placingText.setString("place your's ships.");
+    txt_placingText.setString("place your ships.");
     txt_placingText.setFillColor(sf::Color::White);
     txt_placingText.setPosition({ 128, 10 });
 
