@@ -1,7 +1,7 @@
 #include "Classes.h"
 #include "ScreenState.h"
 #include <iostream>
-#include <string>
+#include <vector>
 
 //presets
 screens screen = screens::MainMenu;
@@ -18,7 +18,9 @@ void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]
 
 int main()
 {
+    srand(time(NULL));
     sf::RenderWindow window(sf::VideoMode({ 900, 950 }), "SeaBattle");
+    
     Mouse mouse;
     //ships:
     //player 1
@@ -36,6 +38,22 @@ int main()
     Ship three_deck2P1(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     //four-deck
     Ship four_deckP1(4, { 10.f, 10.f }, sf::Color(0, 170, 255));
+    std::vector<Ship*> shipsP1_container = {
+        //one-deck
+        &one_deck1P1,
+        &one_deck2P1,
+        &one_deck3P1,
+        &one_deck4P1,
+        //two-deck
+        &two_deck1P1,
+        &two_deck2P1,
+        &two_deck3P1,
+        //three-deck
+        &three_deck1P1,
+        &three_deck2P1,
+        //four-deck
+        &four_deckP1
+    };
 
     //player 2
     Ship one_deck1P2(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
@@ -51,6 +69,22 @@ int main()
     Ship three_deck2P2(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     //four-deck
     Ship four_deckP2(4, { 10.f, 10.f }, sf::Color(0, 170, 255));
+    std::vector<Ship*> shipsP2_container = {
+        //one-deck
+        &one_deck1P2,
+        &one_deck2P2,
+        &one_deck3P2,
+        &one_deck4P2,
+        //two-deck
+        &two_deck1P2,
+        &two_deck2P2,
+        &two_deck3P2,
+        //three-deck
+        &three_deck1P2,
+        &three_deck2P2,
+        //four-deck
+        &four_deckP2
+    };
 
     Button coordinateLetters[10];
     Button coordinateNumbers[10];
@@ -210,7 +244,6 @@ int main()
     Button btn_randomPlacing({ 350, 50 }, sf::Color::Black, sf::Color::White);
     btn_randomPlacing.setOrigin({ 350 / 2, 50 / 2 });
     btn_randomPlacing.setPosition({ 450, 800 });
-
     //setting text
     sf::FloatRect txt_bounds;
     sf::Text txt_PvP(arial, "Player vs Player");
@@ -519,137 +552,79 @@ int main()
 
             //update mouse
             mouse.Update(window);
-            //update ships
-            one_deck1P1.Draggable(mouse);
-            one_deck1P1.Rotatable(mouse, screen);
-            one_deck2P1.Draggable(mouse);
-            one_deck2P1.Rotatable(mouse, screen);
-            one_deck3P1.Draggable(mouse);
-            one_deck3P1.Rotatable(mouse, screen);
-            one_deck4P1.Draggable(mouse);
-            one_deck4P1.Rotatable(mouse, screen);
-
-            two_deck1P1.Draggable(mouse);
-            two_deck1P1.Rotatable(mouse, screen);
-            two_deck2P1.Draggable(mouse);
-            two_deck2P1.Rotatable(mouse, screen);
-            two_deck3P1.Draggable(mouse);
-            two_deck3P1.Rotatable(mouse, screen);
-
-            three_deck1P1.Draggable(mouse);
-            three_deck1P1.Rotatable(mouse, screen);
-            three_deck2P1.Draggable(mouse);
-            three_deck2P1.Rotatable(mouse, screen);
-
-            four_deckP1.Draggable(mouse);
-            four_deckP1.Rotatable(mouse, screen);
+            
+            //updating ships cycle
+            for (Ship* prop : shipsP1_container)
+            {
+                prop->Draggable(mouse);
+                prop->Rotatable(mouse);
+            }
 
             for (int i{}; i < 10; i++)
             {
                 for (int j{}; j < 10; j++)
                 {
-                    player1Field[i][j].Alignbutton(mouse, one_deck1P1);
-                    player1Field[i][j].Alignbutton(mouse, one_deck2P1);
-                    player1Field[i][j].Alignbutton(mouse, one_deck3P1);
-                    player1Field[i][j].Alignbutton(mouse, one_deck4P1);
+                    //aligning all ships
+                    for (Ship* prop : shipsP1_container)
+                    {
+                        player1Field[i][j].Alignbutton(mouse, *prop);
+                        //setting an index to a cell if ship is not dragged
+                        if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                        {
+                            player1Field[i][j].setIndex(1);
+                        }
+                    }
+                }
+            } 
 
-                    player1Field[i][j].Alignbutton(mouse, two_deck1P1);
-                    player1Field[i][j].Alignbutton(mouse, two_deck2P1);
-                    player1Field[i][j].Alignbutton(mouse, two_deck3P1);
-
-                    player1Field[i][j].Alignbutton(mouse, three_deck1P1);
-                    player1Field[i][j].Alignbutton(mouse, three_deck2P1);
-
-                    player1Field[i][j].Alignbutton(mouse, four_deckP1);
-                    player1Field[i][j].drawTo(window);
-                    //1 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck1P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //2 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck2P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //3 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck3P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //4 one-deck
-                    if (player1Field[i][j].ShipisOn(one_deck4P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //1 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck1P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //2 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck2P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //3 two-deck
-                    if (player1Field[i][j].ShipisOn(two_deck3P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //1 three-deck
-                    if (player1Field[i][j].ShipisOn(three_deck1P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-                    //2 three-deck
-                    if (player1Field[i][j].ShipisOn(three_deck2P1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-
-                    //1 four-deck
-                    if (player1Field[i][j].ShipisOn(four_deckP1))
-                    {
-                        player1Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player1Field[i][j].setIndex(0);
-
+            //checking collisions
+            for (Ship* prop : shipsP1_container)
+            {
+                if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP1_container))
+                    prop->color = sf::Color(255, 64, 64);
+                else
+                {
+                    prop->updateLastValidPosition();
+                    prop->color = sf::Color(0, 170, 255);
                 }
             }
 
-            one_deck1P1.Draw(window);
-            one_deck2P1.Draw(window);
-            one_deck3P1.Draw(window);
-            one_deck4P1.Draw(window);
+            //placing if incorrect collision during placing
+            for (Ship* prop : shipsP1_container)
+            {
+                if (mouse.leftRelease)
+                {
+                    if (prop->color == sf::Color(255, 64, 64))
+                        prop->revertToLastPosition();
+                }
+            }
 
-            two_deck1P1.Draw(window);
-            two_deck2P1.Draw(window);
-            two_deck3P1.Draw(window);
+            //aborting rotate if too close to other ships
+            for (Ship* prop : shipsP1_container)
+            {
+                if (mouse.rightRelease)
+                {
+                    if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
+                        && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
+                        && mouse.x >= prop->x && mouse.y >= prop->y))
+                    {
+                        prop->wasClicked = true;
+                    }
+                }
+            }
 
-            three_deck1P1.Draw(window);
-            three_deck2P1.Draw(window);
+            //drawing
+            for (Ship* prop : shipsP1_container)
+            {
+                prop->Draw(window);
+            }
 
-            four_deckP1.Draw(window);
+            //overlap
+            for (Ship* prop : shipsP1_container)
+            {
+                if (prop->isDragged)
+                    prop->Draw(window);
+            }
         }
         
         if (screen == screens::FieldPlayer2)
@@ -666,177 +641,87 @@ int main()
                 window.draw(letters[i]);
                 window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
-                    player2Field[i][j].drawTo(window);
+                    player1Field[i][j].drawTo(window);
                 }
             }
 
-
             //update mouse
             mouse.Update(window);
-            //update ships
-            one_deck1P2.Draggable(mouse);
-            one_deck1P2.Rotatable(mouse, screen);
-            one_deck2P2.Draggable(mouse);
-            one_deck2P2.Rotatable(mouse, screen);
-            one_deck3P2.Draggable(mouse);
-            one_deck3P2.Rotatable(mouse, screen);
-            one_deck4P2.Draggable(mouse);
-            one_deck4P2.Rotatable(mouse, screen);
 
-            two_deck1P2.Draggable(mouse);
-            two_deck1P2.Rotatable(mouse, screen);
-            two_deck2P2.Draggable(mouse);
-            two_deck2P2.Rotatable(mouse, screen);
-            two_deck3P2.Draggable(mouse);
-            two_deck3P2.Rotatable(mouse, screen);
-
-            three_deck1P2.Draggable(mouse);
-            three_deck1P2.Rotatable(mouse, screen);
-            three_deck2P2.Draggable(mouse);
-            three_deck2P2.Rotatable(mouse, screen);
-
-            four_deckP2.Draggable(mouse);
-            four_deckP2.Rotatable(mouse, screen);
+            //updating ships cycle
+            for (Ship* prop : shipsP2_container)
+            {
+                prop->Draggable(mouse);
+                prop->Rotatable(mouse);
+            }
 
             for (int i{}; i < 10; i++)
             {
                 for (int j{}; j < 10; j++)
                 {
-                    player2Field[i][j].Alignbutton(mouse, one_deck1P2);
-                    player2Field[i][j].Alignbutton(mouse, one_deck2P2);
-                    player2Field[i][j].Alignbutton(mouse, one_deck3P2);
-                    player2Field[i][j].Alignbutton(mouse, one_deck4P2);
-
-                    player2Field[i][j].Alignbutton(mouse, two_deck1P2);
-                    player2Field[i][j].Alignbutton(mouse, two_deck2P2);
-                    player2Field[i][j].Alignbutton(mouse, two_deck3P2);
-
-                    player2Field[i][j].Alignbutton(mouse, three_deck1P2);
-                    player2Field[i][j].Alignbutton(mouse, three_deck2P2);
-
-                    player2Field[i][j].Alignbutton(mouse, four_deckP2);
-                    player2Field[i][j].drawTo(window);
-                    //1 one-deck
-                    if (player2Field[i][j].ShipisOn(one_deck1P2))
+                    //aligning all ships
+                    for (Ship* prop : shipsP2_container)
                     {
-                        player2Field[i][j].setIndex(1); continue;
+                        player1Field[i][j].Alignbutton(mouse, *prop);
+                        //setting an index to a cell if ship is not dragged
+                        if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                        {
+                            player1Field[i][j].setIndex(1);
+                        }
                     }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //2 one-deck
-                    if (player2Field[i][j].ShipisOn(one_deck2P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //3 one-deck
-                    if (player2Field[i][j].ShipisOn(one_deck3P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //4 one-deck
-                    if (player2Field[i][j].ShipisOn(one_deck4P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //1 two-deck
-                    if (player2Field[i][j].ShipisOn(two_deck1P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //2 two-deck
-                    if (player2Field[i][j].ShipisOn(two_deck2P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //3 two-deck
-                    if (player2Field[i][j].ShipisOn(two_deck3P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //1 three-deck
-                    if (player2Field[i][j].ShipisOn(three_deck1P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-                    //2 three-deck
-                    if (player2Field[i][j].ShipisOn(three_deck2P2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-
-                    //1 four-deck
-                    if (player2Field[i][j].ShipisOn(four_deckP2))
-                    {
-                        player2Field[i][j].setIndex(1); continue;
-                    }
-                    else
-                        player2Field[i][j].setIndex(0);
-
                 }
             }
 
-            one_deck1P2.Draw(window);
-            one_deck2P2.Draw(window);
-            one_deck3P2.Draw(window);
-            one_deck4P2.Draw(window);
-
-            two_deck1P2.Draw(window);
-            two_deck2P2.Draw(window);
-            two_deck3P2.Draw(window);
-
-            three_deck1P2.Draw(window);
-            three_deck2P2.Draw(window);
-
-            four_deckP2.Draw(window);
-        }
-        if (screen == screens::BattlePlayer1)
-        {
-            if (!PvE)
+            //checking collisions
+            for (Ship* prop : shipsP2_container)
             {
-                window.draw(txt_player);
-            }
-            window.draw(txt_turn);
-            
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player1BattleField[i][j].drawTo(window);
+                if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
+                    prop->color = sf::Color(255, 64, 64);
+                else
+                {
+                    prop->updateLastValidPosition();
+                    prop->color = sf::Color(0, 170, 255);
                 }
             }
-        }
-        if (screen == screens::BattlePlayer2)
-        {
-            window.draw(txt_player);
-            window.draw(txt_turn);
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player2BattleField[i][j].drawTo(window);
+
+            //placing if incorrect collision during placing
+            for (Ship* prop : shipsP2_container)
+            {
+                if (mouse.leftRelease)
+                {
+                    if (prop->color == sf::Color(255, 64, 64))
+                        prop->revertToLastPosition();
                 }
             }
+
+            //aborting rotate if too close to other ships
+            for (Ship* prop : shipsP2_container)
+            {
+                if (mouse.rightRelease)
+                {
+                    if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
+                        && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
+                        && mouse.x >= prop->x && mouse.y >= prop->y))
+                    {
+                        prop->wasClicked = true;
+                    }
+                }
+            }
+
+            //drawing
+            for (Ship* prop : shipsP2_container)
+            {
+                prop->Draw(window);
+            }
+
+            //overlap
+            for (Ship* prop : shipsP2_container)
+            {
+                if (prop->isDragged)
+                    prop->Draw(window);
+            }
         }
+
         window.display();
     }
 }
