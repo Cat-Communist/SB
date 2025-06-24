@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 
 class Mouse
@@ -15,6 +16,7 @@ public:
     bool leftRelease;
     bool rightPress;
     bool rightRelease;
+    bool rightisDown;
 
 public:
     void Update(sf::RenderWindow& window)
@@ -45,13 +47,24 @@ public:
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
         {
             if (!right_click)
+            {
                 rightPress = true;
+                rightisDown = true;
+            }
+            else
+            {
+                rightPress = false;
+                rightisDown = true;
+            }
             right_click = true;
         }
         else
         {
             if (right_click)
+            {
                 rightRelease = true;
+                rightisDown = false;
+            }
             right_click = false;
         }
 
@@ -65,6 +78,9 @@ public:
     float x = 0.f;
     float y = 0.f;
 
+    //last valid position
+    sf::Vector2f last;
+
     //size
     int decks; //amount of cells
     int height = 1;
@@ -77,6 +93,8 @@ public:
     //states
     bool isDragged = false;
     bool wasClicked = false;
+    sf::Clock collisionFlashClock; // Таймер для мигания красным цветом
+    bool isCollisionFlash = false;
 
     //decor
     sf::Color color;
@@ -85,7 +103,7 @@ private:
 public:
     //constructor
     Ship(int decks, sf::Vector2f pos, sf::Color col)
-        : decks(decks), x(pos.x), y(pos.y), color(col)
+        : decks(decks), x(pos.x), y(pos.y), color(col), last(pos)
     {
         rect.setSize({ decks * cell, height * cell });
         rect.setFillColor(color);
@@ -117,6 +135,7 @@ public:
             x = mouse.x - offset_x;
             y = mouse.y - offset_y;
         }
+        rect.setPosition({ x,y });
     }
 
     //draws shape and refreshes its position 
@@ -139,14 +158,17 @@ public:
     //makes shape rotatable
     void Rotatable(Mouse& mouse)
     {
-        if (wasClicked)
+        if (!isDragged) //if not dragged
         {
-            swapSides(decks, height);
-            wasClicked = false;
-        }
-        if (mouse.rightRelease && isInside(mouse.x, mouse.y))
-        {
-            swapSides(decks, height);
+            if (wasClicked)
+            {
+                swapSides(decks, height);
+                wasClicked = false;
+            }
+            if (mouse.rightRelease && isInside(mouse.x, mouse.y))
+            {
+                swapSides(decks, height);
+            }
         }
     }
 
@@ -161,9 +183,45 @@ public:
     {
         x = pos.x;
         y = pos.y;
+        rect.setPosition({ x,y });
+    }
+
+    //updating last valid position
+    void updateLastValidPosition()
+    {
+        if (color == sf::Color(0, 170, 255))
+        {
+            last = { rect.getPosition().x, rect.getPosition().y };
+        }
+    }
+    
+    bool waiting = false;
+
+    //Flash
+    void wait()
+    {
+        color = sf::Color(255, 64, 64);
+        waiting = true;
+        sf::Clock cl;
+        cl.restart();
+        if (waiting && cl.getElapsedTime() >= sf::seconds(2))
+        {
+            waiting = false;
+            color = sf::Color(0, 170, 255);
+            std::cout << "it works\n";
+        }
+        std::cout << "clock: " << cl.getElapsedTime().asSeconds() << "\n";
+    }
+
+    // go back to last
+    void revertToLastPosition() 
+    {
+        x = last.x;
+        y = last.y;
+        rect.setPosition(last); 
+        color = sf::Color(0, 170, 255); 
     }
 };
-
 
 class BattleCell {
 public:
@@ -259,17 +317,36 @@ public:
         }
         return false;
     }
+
     void Alignbutton(Mouse& mouse, Ship& rect)
     {
         if (rect.isDragged && MouseisInside(mouse.x, mouse.y))
         {
-            if (rect.wasClicked)
+            if (rect.height >= rect.decks)
             {
                 rect.setPosition(button.getPosition() - sf::Vector2f{ 0, floor(rect.offset_y / 50) * button_size });
             }
             else
                 rect.setPosition(button.getPosition() - sf::Vector2f{ floor(rect.offset_x / 50) * button_size, 0 });
         }
+    }
+    //use only with battle_cell[0][0]
+    bool checkBoundary(Ship& ship)
+    {
+        float global_border_x0 = button.getPosition().x;
+        float global_border_y0 = button.getPosition().y;
+
+        float global_border_x1 = global_border_x0 + 10 * button_size;
+        float global_border_y1 = global_border_y0 + 10 * button_size;
+
+        float ship_border_x1 = ship.x + ship.cell * ship.decks;
+        float ship_border_y1 = ship.y + ship.cell * ship.height;
+
+
+        if (ship.x < global_border_x0 || ship.y < global_border_y0
+            || ship_border_x1 > global_border_x1 || ship_border_y1 > global_border_y1)
+            return true;
+        return false;
     }
 
     bool ShipisOn(Ship rect)
@@ -364,9 +441,40 @@ enum class screens {
     EndGame
 };
 
-enum class list_of_ships {
-    four,
-    three,
-    two,
-    one
-};
+//functions
+bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
+    for (const Ship* otherShip : otherShips) {
+        if (currentShip == otherShip)
+            continue;
+
+        // Проверка пересечения (прямое наложение)
+        bool isOverlapping =
+            currentShip->x < otherShip->x + otherShip->decks * currentShip->cell &&
+            currentShip->x + currentShip->decks * currentShip->cell > otherShip->x &&
+            currentShip->y < otherShip->y + otherShip->height * currentShip->cell &&
+            currentShip->y + currentShip->height * currentShip->cell > otherShip->y;
+
+        if (isOverlapping) {
+            return true;
+        }
+
+        // Проверка расстояния (минимум 1 клетка между кораблями)
+        // Расширенная область проверки (текущий корабль + 1 клетка вокруг)
+        float expandedLeft = currentShip->x - currentShip->cell;
+        float expandedRight = currentShip->x + currentShip->decks * currentShip->cell + currentShip->cell;
+        float expandedTop = currentShip->y - currentShip->cell;
+        float expandedBottom = currentShip->y + currentShip->height * currentShip->cell + currentShip->cell;
+
+        // Проверяем, попадает ли другой корабль в расширенную область
+        bool isTooClose =
+            otherShip->x < expandedRight &&
+            otherShip->x + otherShip->decks * otherShip->cell > expandedLeft &&
+            otherShip->y < expandedBottom &&
+            otherShip->y + otherShip->height * otherShip->cell > expandedTop;
+
+        if (isTooClose) {
+            return true;
+        }
+    }
+    return false;
+}
