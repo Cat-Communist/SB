@@ -571,6 +571,7 @@ int main()
                         if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
                             player1Field[i][j].setIndex(1);
+                            std::cout << "work\n";
                         }
                     }
                 }
@@ -640,7 +641,7 @@ int main()
                 window.draw(letters[i]);
                 window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
-                    player1Field[i][j].drawTo(window);
+                    player2Field[i][j].drawTo(window);
                 }
             }
 
@@ -661,11 +662,11 @@ int main()
                     //aligning all ships
                     for (Ship* prop : shipsP2_container)
                     {
-                        player1Field[i][j].Alignbutton(mouse, *prop);
+                        player2Field[i][j].Alignbutton(mouse, *prop);
                         //setting an index to a cell if ship is not dragged
-                        if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                        if (player2Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
-                            player1Field[i][j].setIndex(1);
+                            player2Field[i][j].setIndex(1);
                         }
                     }
                 }
@@ -674,7 +675,7 @@ int main()
             //checking collisions
             for (Ship* prop : shipsP2_container)
             {
-                if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
+                if (player2Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
                     prop->color = sf::Color(255, 64, 64);
                 else
                 {
@@ -718,6 +719,39 @@ int main()
             {
                 if (prop->isDragged)
                     prop->Draw(window);
+            }
+        }
+
+        if (screen == screens::BattlePlayer1)
+        {
+            if (!PvE)
+            {
+                window.draw(txt_player);
+            }
+            window.draw(txt_turn);
+
+            for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
+                for (int j = 0; j < 10; ++j) {
+                    player1BattleField[i][j].drawTo(window);
+                }
+            }
+        }
+        if (screen == screens::BattlePlayer2)
+        {
+            window.draw(txt_player);
+            window.draw(txt_turn);
+            for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
+                for (int j = 0; j < 10; ++j) {
+                    player2BattleField[i][j].drawTo(window);
+                }
             }
         }
 
