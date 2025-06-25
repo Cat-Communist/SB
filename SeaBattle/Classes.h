@@ -82,6 +82,8 @@ public:
     }
 };
 
+class BattleCell;
+
 class Ship
 {
 public:
@@ -104,8 +106,8 @@ public:
     //states
     bool isDragged = false;
     bool wasClicked = false;
-    sf::Clock collisionFlashClock; // Таймер для мигания красным цветом
     bool isCollisionFlash = false;
+    bool isDestroyed = false;
 
     //decor
     sf::Color color;
@@ -375,6 +377,44 @@ public:
             return true;
         return false;
     }
+
+    bool checkifDestroyed(Ship ship)
+    {
+        float origin_shipX = (ship.x - button.getPosition().x) / ship.cell;
+        float origin_shipY = (y - button.getPosition().y) / ship.cell;
+
+        int hit_cnt{};
+        
+        int cells = ship.height == 1 ? ship.decks : ship.height;
+
+        for (int i{}; i < cells; i++)
+        {
+            if (button.getFillColor() == sf::Color::Red)
+                hit_cnt++;
+        }
+
+        if (hit_cnt == ship.decks)
+            return true;
+        else
+            return false;
+    }
+
+    //void markDestroyedShips(float minX, float minY, float maxX, float maxY, Ship ship)
+    //{
+    //    bool hasNeighbors = false;
+    //    //only if ship is placed on that cell
+    //    if (index == 1)
+    //    {
+
+    //    }
+
+    //    float leftSide = button.getPosition().x - button_size;
+    //    float rightSide = button.getPosition().x + ship.decks * ship.cell;
+
+    //    float upSide = button.getPosition().y + button_size;
+    //    float downSide = button.getPosition().y - button_size;
+    //    if (button.getPosition().x)
+    //}
 private:
     sf::RectangleShape button;
     int index;

@@ -571,7 +571,6 @@ int main()
                         if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
                             player1Field[i][j].setIndex(1);
-                            std::cout << "work\n";
                         }
                     }
                 }
@@ -737,6 +736,27 @@ int main()
                 window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player1BattleField[i][j].drawTo(window);
+                }
+            }
+
+            for (int i{}; i < 10; i++)
+            {
+                for (int j{}; j < 10; j++)
+                {
+                    if (player2BattleField[i + 1][j].getBackColor() == sf::Color::Red)
+                    {
+                        for (int x{ -1 }; x <= 1; x++)
+                        {
+                            for (int y{ -1 }; y <= 1; y++)
+                            {
+                                //std::cout << (int)player2BattleField[i + x][j + y].getBackColor().r;
+                                if (player2BattleField[i + x][j + y].getIndex() != 1)
+                                {
+                                    player2BattleField[i + x][j + y].setBackColor(sf::Color::White);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
