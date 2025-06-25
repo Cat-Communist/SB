@@ -6,5 +6,7 @@ enum class screens {
     FieldPlayer2,
     BattlePlayer1,
     BattlePlayer2,
+    CheckField1,
+    CheckField2,
     EndGame
 };

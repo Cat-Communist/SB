@@ -89,6 +89,8 @@ int main()
     Button coordinateNumbers[10];
     BattleCell player1Field[10][10];
     BattleCell player2Field[10][10];
+    BattleCell player1CheckField[10][10];
+    BattleCell player2CheckField[10][10];
     BattleCell player1BattleField[10][10];
     BattleCell player2BattleField[10][10];
     float positionX = 225;
@@ -99,58 +101,9 @@ int main()
         coordinateLetters[i].setPosition({ positionX, 175});
         positionX = positionX + 50;
     }
-    positionX = 225;
     for (int i = 0; i < 10; ++i) {
         coordinateNumbers[i] = Button({ 50, 50 }, sf::Color(25, 25, 25), sf::Color::White);
         coordinateNumbers[i].setPosition({ 175, positionY });
-        positionY = positionY + 50;
-    }
-    positionY = 225;
-    // Поле Игрока 1 этапа "Расстановка"
-    positionX = 225;
-    for (int i = 0; i < 10; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            player1Field[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
-        }
-    }
-    for (int i = 0; i < 10; ++i) {
-        positionX = 225;
-        for (int j = 0; j < 10; ++j) {
-            player1Field[i][j].setPosition({ positionX, positionY });
-            positionX = positionX + 50;
-        }
-        positionY = positionY + 50;
-    }
-    positionY = 225;
-    positionX = 225;
-    // Поле Игрока 2 этапа "Расстановка"
-    for (int i = 0; i < 10; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            player2Field[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
-        }
-    }
-    for (int i = 0; i < 10; ++i) {
-        positionX = 225;
-        for (int j = 0; j < 10; ++j) {
-            player2Field[i][j].setPosition({ positionX, positionY });
-            positionX = positionX + 50;
-        }
-        positionY = positionY + 50;
-    }
-    positionY = 225;
-    positionX = 225;
-    // Поле Игрока 1 этапа "Бой"
-    for (int i = 0; i < 10; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            player1BattleField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
-        }
-    }
-    for (int i = 0; i < 10; ++i) {
-        positionX = 225;
-        for (int j = 0; j < 10; ++j) {
-            player1BattleField[i][j].setPosition({ positionX, positionY });
-            positionX = positionX + 50;
-        }
         positionY = positionY + 50;
     }
     positionY = 225;
@@ -158,13 +111,27 @@ int main()
 
     for (int i = 0; i < 10; ++i) {
         for (int j = 0; j < 10; ++j) {
+            player1Field[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
+            player2Field[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
+
+            player1BattleField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
             player2BattleField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
+
+            player1CheckField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
+            player2CheckField[i][j] = BattleCell({ 50, 50 }, sf::Color::Black, sf::Color::White, 0);
         }
     }
     for (int i = 0; i < 10; ++i) {
         positionX = 225;
         for (int j = 0; j < 10; ++j) {
+            player1Field[i][j].setPosition({ positionX, positionY });
+            player2Field[i][j].setPosition({ positionX, positionY });
+
+            player1BattleField[i][j].setPosition({ positionX, positionY });
             player2BattleField[i][j].setPosition({ positionX, positionY });
+
+            player1CheckField[i][j].setPosition({ positionX, positionY });
+            player2CheckField[i][j].setPosition({ positionX, positionY });
             positionX = positionX + 50;
         }
         positionY = positionY + 50;
@@ -232,6 +199,10 @@ int main()
     btn_Exit.setPosition(center + step + step);
 
     //setting 'placing ships' buttons
+    Button btn_randomPlacing({ 350, 50 }, sf::Color::Black, sf::Color::White);
+    btn_randomPlacing.setOrigin({ 350 / 2, 50 / 2 });
+    btn_randomPlacing.setPosition({ 450, 800 });
+
     Button btn_endPlacingP1({350, 50}, sf::Color::Black, sf::Color::White);
     btn_endPlacingP1.setOrigin({ 350 / 2, 50 / 2 });
     btn_endPlacingP1.setPosition({ 450, 870});
@@ -240,9 +211,14 @@ int main()
     btn_endPlacingP2.setOrigin({ 350 / 2, 50 / 2 });
     btn_endPlacingP2.setPosition({ 450, 870 });
 
-    Button btn_randomPlacing({ 350, 50 }, sf::Color::Black, sf::Color::White);
-    btn_randomPlacing.setOrigin({ 350 / 2, 50 / 2 });
-    btn_randomPlacing.setPosition({ 450, 800 });
+    Button btn_seeField({ 350, 50 }, sf::Color::Black, sf::Color::White);
+    btn_seeField.setOrigin({ 350 / 2, 50 / 2 });
+    btn_seeField.setPosition({ 450, 800 });
+
+    Button btn_saveStat({ 350, 50 }, sf::Color::Black, sf::Color::White);
+    btn_saveStat.setOrigin({ 350 / 2, 50 / 2 });
+    btn_saveStat.setPosition({ 450, 870 });
+
     //setting text
     sf::FloatRect txt_bounds;
     sf::Text txt_PvP(arial, "Player vs Player");
@@ -264,6 +240,13 @@ int main()
     txt_Exit.setPosition(center + step + step);
 
     //setting text for placing ships
+
+    sf::Text txt_randomPlacing(arial, "Random");
+    txt_bounds = txt_randomPlacing.getGlobalBounds();
+    txt_randomPlacing.setFillColor(sf::Color::White);
+    txt_randomPlacing.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_randomPlacing.setPosition({ 450, 800 });
+
     sf::Text txt_endPlacingP1(arial, "End placing");
     txt_bounds = txt_endPlacingP1.getGlobalBounds();
     txt_endPlacingP1.setFillColor(sf::Color::White);
@@ -276,15 +259,9 @@ int main()
     txt_endPlacingP2.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
     txt_endPlacingP2.setPosition({ 450, 870 });
 
-    sf::Text txt_randomPlacing(arial, "Random");
-    txt_bounds = txt_randomPlacing.getGlobalBounds();
-    txt_randomPlacing.setFillColor(sf::Color::White);
-    txt_randomPlacing.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-    txt_randomPlacing.setPosition({ 450, 800 });
-
     //text for coordinates
     std::vector<sf::Text> letters;
-    positionX = 290;
+    positionX = 315;
     for (int i = 0; i < 10; i++) {
         sf::Text text(arial);
         text.setString(std::string(1, 'A' + i));
@@ -299,7 +276,7 @@ int main()
     positionX = 225;
 
     std::vector<sf::Text> numbers;
-    positionY = 235;
+    positionY = 240;
     for (int i = 0; i < 9; i++) {
         sf::Text text(arial);
         text.setString(std::string(1, '1' + i));
@@ -307,7 +284,7 @@ int main()
         text.setFillColor(sf::Color::White);
         sf::FloatRect bounds = text.getLocalBounds();
         text.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-        text.setPosition({ 240, positionY });
+        text.setPosition({ 265, positionY });
         numbers.push_back(text);
         positionY = positionY + 50;
     }
@@ -317,7 +294,7 @@ int main()
     text.setFillColor(sf::Color::White);
     sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-    text.setPosition({ 240, positionY });
+    text.setPosition({ 265, positionY });
     numbers.push_back(text);
     positionY = 225;
 
@@ -338,6 +315,24 @@ int main()
     txt_turn.setOrigin({ txt_bounds.getCenter().x * 2, 0 });
     txt_turn.setFillColor(sf::Color::White);
     txt_turn.setPosition({ 870, 10 });
+
+    sf::Text txt_seeField(arial, "Check your field");
+    txt_bounds = txt_seeField.getGlobalBounds();
+    txt_seeField.setFillColor(sf::Color::White);
+    txt_seeField.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_seeField.setPosition({ 450, 800 });
+
+    sf::Text txt_saveStat(arial, "Save statistics");
+    txt_bounds = txt_saveStat.getGlobalBounds();
+    txt_saveStat.setFillColor(sf::Color::White);
+    txt_saveStat.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_saveStat.setPosition({ 450, 870 });
+
+    sf::Text txt_backToBattle(arial, "Back to battle");
+    txt_bounds = txt_backToBattle.getGlobalBounds();
+    txt_backToBattle.setFillColor(sf::Color::White);
+    txt_backToBattle.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_backToBattle.setPosition({ 450, 800 });
 
     while (window.isOpen())
     {
@@ -395,6 +390,7 @@ int main()
                         btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
                             copyFieldToBattleField(player1Field, player2BattleField);
+                            copyFieldToBattleField(player1Field, player1CheckField);
                             if (PvE)
                                 screen = screens::BattlePlayer1;
                             else
@@ -410,6 +406,12 @@ int main()
                     }
                     else
                         btn_randomPlacing.setBackColor(sf::Color());
+
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            player1Field[i][j].setBackColor(sf::Color::Black);
+                        }
+                    }
                     break;
                 }
                 case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
@@ -419,6 +421,7 @@ int main()
                         btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
                         if (event->is<sf::Event::MouseButtonPressed>()) {
                             copyFieldToBattleField(player2Field, player1BattleField);
+                            copyFieldToBattleField(player2Field, player2CheckField);
                             screen = screens::BattlePlayer1;
                         }
                     }
@@ -431,6 +434,7 @@ int main()
                     }
                     else
                         btn_randomPlacing.setBackColor(sf::Color()); 
+
                     break;
                 }
                 case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
@@ -470,6 +474,14 @@ int main()
                             }
                         }
                     }
+                    if (btn_seeField.isMouseOver(window)) {
+                        btn_seeField.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            screen = screens::CheckField1;
+                        }
+                    }
+                    else
+                        btn_seeField.setBackColor(sf::Color());
                     break;
                 }
                 case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
@@ -512,6 +524,70 @@ int main()
                             }
                         }
                     }
+                    if (btn_seeField.isMouseOver(window)) {
+                        btn_seeField.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            screen = screens::CheckField2;
+                        }
+                    }
+                    else
+                        btn_seeField.setBackColor(sf::Color());
+                    break;
+                }
+                case screens::CheckField1:
+                {
+                    if (btn_seeField.isMouseOver(window)) {
+                        btn_seeField.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            screen = screens::BattlePlayer1;
+                        }
+                    }
+                    else
+                        btn_seeField.setBackColor(sf::Color());
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player1CheckField[i][j].getIndex() == 1 && !(player2BattleField[i][j].getBackColor() == sf::Color::Red))
+                            {
+                                player1CheckField[i][j].setBackColor(sf::Color(0, 170, 255));
+                            }
+                            else if (player2BattleField[i][j].getBackColor() == sf::Color::White)
+                            {
+                                player1CheckField[i][j].setBackColor(sf::Color::White);
+                            }
+                            else if (player2BattleField[i][j].getBackColor() == sf::Color::Red)
+                            {
+                                player1CheckField[i][j].setBackColor(sf::Color::Red);
+                            }
+                        }
+                    }
+                    break;
+                }
+                case screens::CheckField2:
+                {
+                    if (btn_seeField.isMouseOver(window)) {
+                        btn_seeField.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            screen = screens::BattlePlayer2;
+                        }
+                    }
+                    else
+                        btn_seeField.setBackColor(sf::Color());
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player2CheckField[i][j].getIndex() == 1 && !(player1BattleField[i][j].getBackColor() == sf::Color::Red))
+                            {
+                                player2CheckField[i][j].setBackColor(sf::Color(0, 170, 255));
+                            }
+                            else if (player1BattleField[i][j].getBackColor() == sf::Color::White)
+                            {
+                                player2CheckField[i][j].setBackColor(sf::Color::White);
+                            }
+                            else if (player1BattleField[i][j].getBackColor() == sf::Color::Red)
+                            {
+                                player2CheckField[i][j].setBackColor(sf::Color::Red);
+                            }
+                        }
+                    }
                     break;
                 }
             }
@@ -549,6 +625,12 @@ int main()
                 }
             }
 
+            for (int i = 0; i < 10; ++i) {
+                for (int j = 0; j < 10; ++j) {
+                    player1Field[i][j].setIndex(0);
+                }
+            }
+
             //update mouse
             mouse.Update(window);
             
@@ -571,7 +653,6 @@ int main()
                         if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
                             player1Field[i][j].setIndex(1);
-                            std::cout << "work\n";
                         }
                     }
                 }
@@ -642,6 +723,12 @@ int main()
                 window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player2Field[i][j].drawTo(window);
+                }
+            }
+
+            for (int i = 0; i < 10; ++i) {
+                for (int j = 0; j < 10; ++j) {
+                    player2Field[i][j].setIndex(0);
                 }
             }
 
@@ -730,6 +817,11 @@ int main()
             }
             window.draw(txt_turn);
 
+            btn_seeField.drawTo(window);
+            btn_saveStat.drawTo(window);
+            window.draw(txt_seeField);
+            window.draw(txt_saveStat);
+
             for (int i = 0; i < 10; ++i) {
                 coordinateLetters[i].drawTo(window);
                 coordinateNumbers[i].drawTo(window);
@@ -744,6 +836,12 @@ int main()
         {
             window.draw(txt_player);
             window.draw(txt_turn);
+
+            btn_seeField.drawTo(window);
+            btn_saveStat.drawTo(window);
+            window.draw(txt_seeField);
+            window.draw(txt_saveStat);
+
             for (int i = 0; i < 10; ++i) {
                 coordinateLetters[i].drawTo(window);
                 coordinateNumbers[i].drawTo(window);
@@ -751,6 +849,45 @@ int main()
                 window.draw(numbers[i]);
                 for (int j = 0; j < 10; ++j) {
                     player2BattleField[i][j].drawTo(window);
+                }
+            }
+        }
+        if (screen == screens::CheckField1)
+        {
+            if (!PvE)
+            {
+                window.draw(txt_player);
+            }
+            window.draw(txt_turn);
+
+            btn_seeField.drawTo(window);
+            window.draw(txt_backToBattle);
+
+            for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
+                for (int j = 0; j < 10; ++j) {
+                    player1CheckField[i][j].drawTo(window);
+                }
+            }
+        }
+        if (screen == screens::CheckField2)
+        {
+            window.draw(txt_player);
+            window.draw(txt_turn);
+
+            btn_seeField.drawTo(window);
+            window.draw(txt_backToBattle);
+
+            for (int i = 0; i < 10; ++i) {
+                coordinateLetters[i].drawTo(window);
+                coordinateNumbers[i].drawTo(window);
+                window.draw(letters[i]);
+                window.draw(numbers[i]);
+                for (int j = 0; j < 10; ++j) {
+                    player2CheckField[i][j].drawTo(window);
                 }
             }
         }
