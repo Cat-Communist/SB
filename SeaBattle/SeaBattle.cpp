@@ -396,122 +396,123 @@ int main()
                         btn_PvE.setBackColor(sf::Color(btn_col_reg));
                     }
 
-                if (btn_Exit.isMouseOver(window)) {
-                    btn_Exit.setBackColor(sf::Color(btn_col_dark));
-                    if (event->is<sf::Event::MouseButtonPressed>()) {
-                        window.close();
+                    if (btn_Exit.isMouseOver(window)) {
+                        btn_Exit.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            window.close();
+                        }
                     }
-                }
-                else {
-                    btn_Exit.setBackColor(sf::Color(btn_col_reg));
-                }
-
-                break;
-            }
-            case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
-            {
-                txt_player.setString("Player 1");
-                if (btn_endPlacingP1.isMouseOver(window)) {
-                    btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
-                    if (event->is<sf::Event::MouseButtonPressed>()) {
-                        copyFieldToBattleField(player1Field, player2BattleField);
-                        if (PvE)
-                            screen = screens::BattlePlayer1;
-                        else
-                            screen = screens::FieldPlayer2;
+                    else {
+                        btn_Exit.setBackColor(sf::Color(btn_col_reg));
                     }
+                    break;
                 }
-                else
-                    btn_endPlacingP1.setBackColor(sf::Color());
+                case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
+                {
+                    txt_player.setString("Player 1");
+                    if (btn_endPlacingP1.isMouseOver(window)) {
+                        btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            copyFieldToBattleField(player1Field, player2BattleField);
+                            if (PvE)
+                                screen = screens::BattlePlayer1;
+                            else
+                                screen = screens::FieldPlayer2;
+                        }
+                    }
+                    else
+                        btn_endPlacingP1.setBackColor(sf::Color());
 
-                if (btn_randomPlacing.isMouseOver(window)) {
-                    btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
-                    random = true;
-                    if (event->is<sf::Event::MouseButtonPressed>())
-                    {
-                        // Сброс позиций кораблей
-                        int i = 0;
-                        for (Ship* prop : shipsP1_container)
+                    if (btn_randomPlacing.isMouseOver(window)) {
+                        btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
+                        random = true;
+                        if (event->is<sf::Event::MouseButtonPressed>())
                         {
-                            prop->setPosition({ 0.f + i * 250.f, 0.f });
-                            if (prop->height > prop->width) prop->wasClicked = true;
-                            ++i;
-                            prop->color = sf::Color(0, 170, 255);
-                        }
-
-                        // Пытаемся разместить случайно
-                        bool RandomSuccess = true;
-                        std::sort(shipsP1_container.begin(), shipsP1_container.end(),
-                            [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
-
-                        for (Ship* prop : shipsP1_container) {
-                            for (int attempt = 0; attempt < 1000; ++attempt) {
-                                if (!RandomPlacing(player1Field, prop, shipsP1_container)) {
-                                    break;
-                                }
-                                if (attempt == 999)
-                                    RandomSuccess = false;
-                            }
-                        }
-                        int cnt{};
-                        for (Ship* prop : shipsP1_container)
-                        {
-                            while (RandomPlacing(player1Field, prop, shipsP1_container)) {
-                                cnt++;
-                                std::cout << cnt << "\n";
-                            }
-                        }
-                        std::cout << "RandomSuccess: " << RandomSuccess << "\n";
-
-                        // Проверяем корректность
-                        if (RandomSuccess) {
-                            for (Ship* prop : shipsP1_container) {
-                                if (player1Field[0][0].checkBoundary(*prop) ||
-                                    checkCollision(prop, shipsP1_container)) {
-                                    RandomSuccess = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Если не удалось - применяем пресет
-                        if (!RandomSuccess) {
-                            // Сброс позиций
-                            i = 0;
-                            for (Ship* prop : shipsP1_container) {
+                            // Сброс позиций кораблей
+                            int i = 0;
+                            for (Ship* prop : shipsP1_container)
+                            {
                                 prop->setPosition({ 0.f + i * 250.f, 0.f });
-                                if (prop->height != 1) prop->wasClicked = true;
+                                if (prop->height > prop->width) prop->wasClicked = true;
                                 ++i;
                                 prop->color = sf::Color(0, 170, 255);
                             }
 
-                            // Применяем пресет
-                            RandomPresets(player1Field, shipsP1_container);
+                            // Пытаемся разместить случайно
+                            bool RandomSuccess = true;
+                            std::sort(shipsP1_container.begin(), shipsP1_container.end(),
+                                [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
 
-                            // Обновляем индексы клеток после пресета
-                            for (Ship* ship : shipsP1_container) {
-                                for (int y = 0; y < 10; ++y) {
-                                    for (int x = 0; x < 10; ++x) {
-                                        if (player1Field[y][x].ShipisOn(*ship)) {
-                                            player1Field[y][x].setIndex(1);
-                                        }
+                            for (Ship* prop : shipsP1_container) {
+                                for (int attempt = 0; attempt < 1000; ++attempt) {
+                                    if (!RandomPlacing(player1Field, prop, shipsP1_container)) {
+                                        break;
+                                    }
+                                    if (attempt == 999)
+                                        RandomSuccess = false;
+                                }
+                            }
+                            int cnt{};
+                            for (Ship* prop : shipsP1_container)
+                            {
+                                while (RandomPlacing(player1Field, prop, shipsP1_container)) {
+                                    cnt++;
+                                    std::cout << cnt << "\n";
+                                }
+                            }
+                            std::cout << "RandomSuccess: " << RandomSuccess << "\n";
+
+                            // Проверяем корректность
+                            if (RandomSuccess) {
+                                for (Ship* prop : shipsP1_container) {
+                                    if (player1Field[0][0].checkBoundary(*prop) ||
+                                        checkCollision(prop, shipsP1_container)) {
+                                        RandomSuccess = false;
+                                        break;
                                     }
                                 }
                             }
-                            std::cout << "Preset\n";
-                        }
-                        else {
-                            std::cout << "Random\n";
+
+                            // Если не удалось - применяем пресет
+                            if (!RandomSuccess) {
+                                // Сброс позиций
+                                i = 0;
+                                for (Ship* prop : shipsP1_container) {
+                                    prop->setPosition({ 0.f + i * 250.f, 0.f });
+                                    if (prop->height != 1) prop->wasClicked = true;
+                                    ++i;
+                                    prop->color = sf::Color(0, 170, 255);
+                                }
+
+                                // Применяем пресет
+                                RandomPresets(player1Field, shipsP1_container);
+
+                                // Обновляем индексы клеток после пресета
+                                for (Ship* ship : shipsP1_container) {
+                                    for (int y = 0; y < 10; ++y) {
+                                        for (int x = 0; x < 10; ++x) {
+                                            if (player1Field[y][x].ShipisOn(*ship)) {
+                                                player1Field[y][x].setIndex(1);
+                                            }
+                                        }
+                                    }
+                                }
+                                std::cout << "Preset\n";
+                            }
+                            else {
+                                std::cout << "Random\n";
+                            }
                         }
                     }
+                    else
+                        btn_randomPlacing.setBackColor(sf::Color());
+                    std::cout << "Why\n";
+                    break;
                 }
-                else
-                    btn_randomPlacing.setBackColor(sf::Color());
-                break;
-            }
             case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
             {
                 txt_player.setString("Player 2");
+                std::cout << "Settted: " << txt_player.getString() << "\n";
                 if (btn_endPlacingP2.isMouseOver(window)) {
                     btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
@@ -838,11 +839,11 @@ int main()
                     }
                 }
 
-            for (int i = 0; i < 10; ++i) {
-                for (int j = 0; j < 10; ++j) {
-                    player1Field[i][j].setIndex(0);
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        player1Field[i][j].setIndex(0);
+                    }
                 }
-            }
 
             //update mouse
             mouse.Update(window);
@@ -939,11 +940,11 @@ int main()
                     }
                 }
 
-            for (int i = 0; i < 10; ++i) {
-                for (int j = 0; j < 10; ++j) {
-                    player2Field[i][j].setIndex(0);
+                for (int i = 0; i < 10; ++i) {
+                    for (int j = 0; j < 10; ++j) {
+                        player2Field[i][j].setIndex(0);
+                    }
                 }
-            }
 
             //update mouse
             mouse.Update(window);
