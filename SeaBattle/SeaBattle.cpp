@@ -219,6 +219,10 @@ int main()
     btn_saveStat.setOrigin({ 350 / 2, 50 / 2 });
     btn_saveStat.setPosition({ 450, 870 });
 
+    Button btn_saveEndStat(btn_size, btn_col_reg, sf::Color::Black);
+    btn_saveEndStat.setOrigin({ btn_size.x / 2, btn_size.y / 2 });
+    btn_saveEndStat.setPosition(center + step);
+
     //setting text
     sf::FloatRect txt_bounds;
     sf::Text txt_PvP(arial, "Player vs Player");
@@ -334,6 +338,22 @@ int main()
     txt_backToBattle.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
     txt_backToBattle.setPosition({ 450, 800 });
 
+    sf::Text txt_win(arial, "Player 1 win");
+    txt_win.setCharacterSize(100);
+    txt_bounds = txt_win.getGlobalBounds();
+    txt_win.setFillColor(sf::Color::White);
+    txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_win.setPosition({ 450, 225 });
+
+    sf::Text txt_saveEndStat(arial, "Save statistics");
+    txt_bounds = txt_saveEndStat.getGlobalBounds();
+    txt_saveEndStat.setFillColor(sf::Color::Black);
+    txt_saveEndStat.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+    txt_saveEndStat.setPosition(center + step);
+
+    int shots1 = 0;
+    int shots2 = 0;
+
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
@@ -353,6 +373,8 @@ int main()
                         if (event->is<sf::Event::MouseButtonPressed>()) {
                             mouse.Reset();
                             screen = screens::FieldPlayer1;
+                            shots1 = 0;
+                            shots2 = 0;
                         }
                     }
                     else {
@@ -365,6 +387,7 @@ int main()
                             mouse.Reset();
                             screen = screens::FieldPlayer1;
                             PvE = true;
+                            shots1 = 0;
                         }
                     }
                     else {
@@ -465,6 +488,19 @@ int main()
                                 {
                                     if (player1BattleField[i][j].getIndex() == 1) {
                                         player1BattleField[i][j].setBackColor(sf::Color::Red);
+                                        shots1++;
+                                        if (shots1 == 20)
+                                        {
+                                            screen = screens::EndGame;
+                                            if (!PvE)
+                                            {
+                                                txt_win.setString("Player 1 win!");
+                                            }
+                                            else
+                                            {
+                                                txt_win.setString("You win!");
+                                            }
+                                        }
                                     }
                                     else {
                                         player1BattleField[i][j].setBackColor(sf::Color::White);
@@ -513,6 +549,12 @@ int main()
                                     if (player2BattleField[i][j].getIndex() == 1)
                                     {
                                         player2BattleField[i][j].setBackColor(sf::Color::Red);
+                                        shots2++;
+                                        if (shots2 == 20)
+                                        {
+                                            screen = screens::EndGame;
+                                            txt_win.setString("Player 2 win!");
+                                        }
                                     }
                                     else
                                     {
@@ -587,6 +629,29 @@ int main()
                                 player2CheckField[i][j].setBackColor(sf::Color::Red);
                             }
                         }
+                    }
+                    break;
+                }
+                case screens::EndGame:
+                {
+                    if (btn_saveEndStat.isMouseOver(window)) {
+                        btn_saveEndStat.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            window.close();
+                        }
+                    }
+                    else {
+                        btn_saveEndStat.setBackColor(sf::Color(btn_col_reg));
+                    }
+
+                    if (btn_Exit.isMouseOver(window)) {
+                        btn_Exit.setBackColor(sf::Color(btn_col_dark));
+                        if (event->is<sf::Event::MouseButtonPressed>()) {
+                            window.close();
+                        }
+                    }
+                    else {
+                        btn_Exit.setBackColor(sf::Color(btn_col_reg));
                     }
                     break;
                 }
@@ -890,6 +955,14 @@ int main()
                     player2CheckField[i][j].drawTo(window);
                 }
             }
+        }
+        if (screen == screens::EndGame)
+        {
+            btn_saveEndStat.drawTo(window);
+            btn_Exit.drawTo(window);
+            window.draw(txt_saveEndStat);
+            window.draw(txt_Exit);
+            window.draw(txt_win);
         }
 
         window.display();
