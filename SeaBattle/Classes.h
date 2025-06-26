@@ -358,8 +358,8 @@ public:
 
     bool ShipisOn(Ship rect)
     {
-        if (button.getPosition().x >= rect.x && button.getPosition().x <= rect.x + rect.width
-            && button.getPosition().y >= rect.y && button.getPosition().y <= rect.y + rect.height)
+        if (button.getPosition().x >= rect.x && button.getPosition().x < rect.x + rect.width
+            && button.getPosition().y >= rect.y && button.getPosition().y < rect.y + rect.height)
             return true;
         return false;
     }
