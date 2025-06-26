@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <random>
+#include <algorithm>
 #include <SFML/Graphics.hpp>
 #include "ScreenState.h"
 
@@ -94,8 +96,9 @@ public:
 
     //size
     int decks; //amount of cells
-    int height = 1;
     float cell = 50.f; //one cell size
+    float height = cell;
+    float width;
 
     //offsets
     float offset_x = 0.f;
@@ -114,9 +117,9 @@ private:
 public:
     //constructor
     Ship(int decks, sf::Vector2f pos, sf::Color col)
-        : decks(decks), x(pos.x), y(pos.y), color(col), last(pos)
+        : decks(decks), x(pos.x), y(pos.y), color(col), last(pos), width(decks * cell)
     {
-        rect.setSize({ decks * cell, height * cell });
+        rect.setSize({ width, height});
         rect.setFillColor(color);
         rect.setPosition({x, y});
     }
@@ -127,8 +130,8 @@ public:
 
     bool isInside(float x, float y)
     {
-        if (x > this->x && x < this->x + decks * cell
-            && y > this->y && y < this->y + height * cell)
+        if (x > this->x && x < this->x + width
+            && y > this->y && y < this->y + height)
             return true;
         return false;
     }
@@ -156,16 +159,16 @@ public:
     //draws shape and refreshes its position 
     void Draw(sf::RenderWindow& window)
     {
-        rect.setSize({ decks * cell, height * cell });
+        rect.setSize({ width, height });
         rect.setFillColor(color);
         rect.setPosition({ x,y });
         window.draw(rect);
     }
 
     //swaps sides of a shape
-    void swapSides(int& w, int& h)
+    void swapSides(float& w, float& h)
     {
-        int temp = w;
+        float temp = w;
         w = h;
         h = temp;
     }
@@ -177,12 +180,12 @@ public:
         {
             if (wasClicked)
             {
-                swapSides(decks, height);
+                swapSides(width, height);
                 wasClicked = false;
             }
             if (mouse.rightRelease && isInside(mouse.x, mouse.y))
             {
-                swapSides(decks, height);
+                swapSides(width, height);
             }
         }
     }
@@ -212,23 +215,7 @@ public:
     
     bool waiting = false;
 
-    //Flash
-    void wait()
-    {
-        color = sf::Color(255, 64, 64);
-        waiting = true;
-        sf::Clock cl;
-        cl.restart();
-        if (waiting && cl.getElapsedTime() >= sf::seconds(2))
-        {
-            waiting = false;
-            color = sf::Color(0, 170, 255);
-            std::cout << "it works\n";
-        }
-        std::cout << "clock: " << cl.getElapsedTime().asSeconds() << "\n";
-    }
-
-    // go back to last
+    //go back to last
     void revertToLastPosition() 
     {
         x = last.x;
@@ -236,6 +223,7 @@ public:
         rect.setPosition(last); 
         color = sf::Color(0, 170, 255); 
     }
+
 };
 
 class BattleCell {
@@ -341,7 +329,7 @@ public:
     {
         if (rect.isDragged && MouseisInside(mouse.x, mouse.y))
         {
-            if (rect.height >= rect.decks)
+            if (rect.height >= rect.width)  
             {
                 rect.setPosition(button.getPosition() - sf::Vector2f{ 0, floor(rect.offset_y / 50) * button_size });
             }
@@ -358,8 +346,8 @@ public:
         float global_border_x1 = global_border_x0 + 10 * button_size;
         float global_border_y1 = global_border_y0 + 10 * button_size;
 
-        float ship_border_x1 = ship.x + ship.cell * ship.decks;
-        float ship_border_y1 = ship.y + ship.cell * ship.height;
+        float ship_border_x1 = ship.x + ship.width;
+        float ship_border_y1 = ship.y + ship.height;
 
 
         if (ship.x < global_border_x0 || ship.y < global_border_y0
@@ -370,8 +358,8 @@ public:
 
     bool ShipisOn(Ship rect)
     {
-        if (button.getPosition().x >= rect.x && button.getPosition().x < rect.x + rect.decks * rect.cell
-            && button.getPosition().y >= rect.y && button.getPosition().y < rect.y + rect.height * rect.cell)
+        if (button.getPosition().x >= rect.x && button.getPosition().x <= rect.x + rect.width
+            && button.getPosition().y >= rect.y && button.getPosition().y <= rect.y + rect.height)
             return true;
         return false;
     }
@@ -459,10 +447,10 @@ bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
 
         // Проверка пересечения (прямое наложение)
         bool isOverlapping =
-            currentShip->x < otherShip->x + otherShip->decks * currentShip->cell &&
-            currentShip->x + currentShip->decks * currentShip->cell > otherShip->x &&
-            currentShip->y < otherShip->y + otherShip->height * currentShip->cell &&
-            currentShip->y + currentShip->height * currentShip->cell > otherShip->y;
+            currentShip->x < otherShip->x + otherShip->width &&
+            currentShip->x + currentShip->width > otherShip->x &&
+            currentShip->y < otherShip->y + otherShip->height &&
+            currentShip->y + currentShip->height > otherShip->y;
 
         if (isOverlapping) {
             return true;
@@ -471,20 +459,151 @@ bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
         // Проверка расстояния (минимум 1 клетка между кораблями)
         // Расширенная область проверки (текущий корабль + 1 клетка вокруг)
         float expandedLeft = currentShip->x - currentShip->cell;
-        float expandedRight = currentShip->x + currentShip->decks * currentShip->cell + currentShip->cell;
+        float expandedRight = currentShip->x + currentShip->width + currentShip->cell;
         float expandedTop = currentShip->y - currentShip->cell;
-        float expandedBottom = currentShip->y + currentShip->height * currentShip->cell + currentShip->cell;
+        float expandedBottom = currentShip->y + currentShip->height + currentShip->cell;
 
         // Проверяем, попадает ли другой корабль в расширенную область
         bool isTooClose =
             otherShip->x < expandedRight &&
-            otherShip->x + otherShip->decks * otherShip->cell > expandedLeft &&
+            otherShip->x + otherShip->width > expandedLeft &&
             otherShip->y < expandedBottom &&
-            otherShip->y + otherShip->height * otherShip->cell > expandedTop;
+            otherShip->y + otherShip->height > expandedTop;
 
         if (isTooClose) {
             return true;
         }
     }
     return false;
+}
+
+bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> otherShips)
+{
+    srand(time(NULL));
+
+    std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<> pos_dist(0, 9);
+    std::uniform_int_distribution<> rot_dist(0, 1);
+
+    int random_x = pos_dist(gen);
+    int random_y = pos_dist(gen);
+    bool random_state = rot_dist(gen);
+    ship->setPosition(field[random_y][random_x].getPosition());
+    ship->wasClicked = random_state;
+    if (random_state)
+    {
+        ship->swapSides(ship->width, ship->height);
+        ship->wasClicked = false;
+    }
+
+    if (field[0][0].checkBoundary(*ship) || checkCollision(ship, otherShips))
+    {
+        
+        return true;
+    }
+
+    return false;
+}
+
+void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
+{
+    std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<> dist(1, 5);
+
+    int choice = dist(gen);
+
+    auto iter = otherShips.begin();
+    int i{};
+    switch (choice)
+    {
+    case 1:
+    {
+        std::cout << "1\n";
+        (*(iter + i++))->setPosition(field[4][0].getPosition());
+        (*(iter + i++))->setPosition(field[9][3].getPosition());
+        (*(iter + i++))->setPosition(field[9][9].getPosition());
+        (*(iter + i++))->setPosition(field[6][9].getPosition());
+
+        (*(iter + i++))->setPosition(field[4][5].getPosition());
+        (*(iter + i++))->setPosition(field[7][0].getPosition());
+        (*(iter + i++))->setPosition(field[5][4].getPosition());
+
+        (*(iter + i++))->setPosition(field[2][0].getPosition()); (*(iter + i - 1))->wasClicked =  true;
+        (*(iter + i++))->setPosition(field[1][7].getPosition()); (*(iter + i - 1))->wasClicked =  true;
+
+        (*(iter + i++))->setPosition(field[0][5].getPosition());
+        break;
+    }
+    case 2:
+    {
+        std::cout << "2\n";
+        (*(iter + i++))->setPosition(field[1][1].getPosition());
+        (*(iter + i++))->setPosition(field[3][3].getPosition());
+        (*(iter + i++))->setPosition(field[5][5].getPosition());
+        (*(iter + i++))->setPosition(field[7][7].getPosition());
+
+        (*(iter + i++))->setPosition(field[0][7].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[2][0].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[4][9].getPosition()); (*(iter + i - 1))->wasClicked = true;
+
+        (*(iter + i++))->setPosition(field[6][2].getPosition());
+        (*(iter + i++))->setPosition(field[8][4].getPosition());
+
+        (*(iter + i++))->setPosition(field[9][0].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        break;
+    }
+    case 3:
+    {
+        std::cout << "3\n";
+        (*(iter + i++))->setPosition(field[0][2].getPosition());
+        (*(iter + i++))->setPosition(field[2][4].getPosition());
+        (*(iter + i++))->setPosition(field[4][6].getPosition());
+        (*(iter + i++))->setPosition(field[6][8].getPosition());
+
+        (*(iter + i++))->setPosition(field[1][0].getPosition());
+        (*(iter + i++))->setPosition(field[3][9].getPosition());
+        (*(iter + i++))->setPosition(field[5][1].getPosition());
+
+        (*(iter + i++))->setPosition(field[7][3].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[9][5].getPosition()); (*(iter + i - 1))->wasClicked = true;
+
+        (*(iter + i++))->setPosition(field[0][7].getPosition());
+        break;
+    }
+    case 4:
+    {
+        std::cout << "4\n";
+        (*(iter + i++))->setPosition(field[0][1].getPosition());
+        (*(iter + i++))->setPosition(field[2][3].getPosition());
+        (*(iter + i++))->setPosition(field[4][5].getPosition());
+        (*(iter + i++))->setPosition(field[6][7].getPosition());
+
+        (*(iter + i++))->setPosition(field[1][9].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[3][0].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[5][2].getPosition()); (*(iter + i - 1))->wasClicked = true;
+
+        (*(iter + i++))->setPosition(field[7][4].getPosition());
+        (*(iter + i++))->setPosition(field[9][6].getPosition());
+
+        (*(iter + i++))->setPosition(field[0][8].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        break;
+    }
+    case 5:
+    {
+        std::cout << "5\n";
+        (*(iter + i++))->setPosition(field[0][3].getPosition()); std::cout << (*iter)->getPosition().x;
+        (*(iter + i++))->setPosition(field[2][5].getPosition());
+        (*(iter + i++))->setPosition(field[4][7].getPosition());
+        (*(iter + i++))->setPosition(field[6][9].getPosition());
+
+        (*(iter + i++))->setPosition(field[1][1].getPosition());
+        (*(iter + i++))->setPosition(field[3][0].getPosition());
+        (*(iter + i++))->setPosition(field[5][2].getPosition());
+
+        (*(iter + i++))->setPosition(field[7][4].getPosition()); (*(iter + i - 1))->wasClicked = true;
+        (*(iter + i++))->setPosition(field[9][6].getPosition()); (*(iter + i - 1))->wasClicked = true;
+
+        (*(iter + i++))->setPosition(field[0][8].getPosition());
+    }
+    }
 }

@@ -6,6 +6,7 @@
 //presets
 screens screen = screens::MainMenu;
 sf::Font arial("FONTS/arialmt.ttf");
+bool random = false;
 
 void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]) {
     for (int i = 0; i < 10; ++i) {
@@ -84,6 +85,7 @@ int main()
         //four-deck
         &four_deckP2
     };
+
 
     Button coordinateLetters[10];
     Button coordinateNumbers[10];
@@ -347,414 +349,577 @@ int main()
                 window.close();
             switch (screen)
             {
-                case screens::MainMenu:
-                {
-                    //handle events onMouse
-                    PvE = false;
-                    turnNumber = 1;
-                    txt_turn.setString("Turn " + std::to_string(turnNumber));
-                    if (btn_PvP.isMouseOver(window)) {
-                        btn_PvP.setBackColor(sf::Color(btn_col_dark));
-                        if (event->is<sf::Event::MouseButtonPressed>()) {
-                            mouse.Reset();
-                            screen = screens::FieldPlayer1;
-                        }
+            case screens::MainMenu:
+            {
+                //handle events onMouse
+                PvE = false;
+                turnNumber = 1;
+                txt_turn.setString("Turn " + std::to_string(turnNumber));
+                if (btn_PvP.isMouseOver(window)) {
+                    btn_PvP.setBackColor(sf::Color(btn_col_dark));
+                    if (event->is<sf::Event::MouseButtonPressed>()) {
+                        mouse.Reset();
+                        screen = screens::FieldPlayer1;
                     }
-                    else {
-                        btn_PvP.setBackColor(sf::Color(btn_col_reg));
-                    }
-
-                    if (btn_PvE.isMouseOver(window)) {
-                        btn_PvE.setBackColor(sf::Color(btn_col_dark));
-                        if (event->is<sf::Event::MouseButtonPressed>()) {
-                            mouse.Reset();
-                            screen = screens::FieldPlayer1;
-                            PvE = true;
-                        }
-                    }
-                    else {
-                        btn_PvE.setBackColor(sf::Color(btn_col_reg));
-                    }
-
-                    if (btn_Exit.isMouseOver(window)) {
-                        btn_Exit.setBackColor(sf::Color(btn_col_dark));
-                        if (event->is<sf::Event::MouseButtonPressed>()) {
-                            window.close();
-                        }
-                    }
-                    else {
-                        btn_Exit.setBackColor(sf::Color(btn_col_reg));
-                    }
-
-                    break;
                 }
-                case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
-                {
-                    txt_player.setString("Player 1");
-                    if (btn_endPlacingP1.isMouseOver(window)) {
-                        btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
-                        if (event->is<sf::Event::MouseButtonPressed>()) {
-                            copyFieldToBattleField(player1Field, player2BattleField);
-                            if (PvE)
-                                screen = screens::BattlePlayer1;
-                            else
-                                screen = screens::FieldPlayer2;
+                else {
+                    btn_PvP.setBackColor(sf::Color(btn_col_reg));
+                }
+
+                if (btn_PvE.isMouseOver(window)) {
+                    btn_PvE.setBackColor(sf::Color(btn_col_dark));
+                    if (event->is<sf::Event::MouseButtonPressed>()) {
+                        mouse.Reset();
+                        screen = screens::FieldPlayer1;
+                        PvE = true;
+                    }
+                }
+                else {
+                    btn_PvE.setBackColor(sf::Color(btn_col_reg));
+                }
+
+                if (btn_Exit.isMouseOver(window)) {
+                    btn_Exit.setBackColor(sf::Color(btn_col_dark));
+                    if (event->is<sf::Event::MouseButtonPressed>()) {
+                        window.close();
+                    }
+                }
+                else {
+                    btn_Exit.setBackColor(sf::Color(btn_col_reg));
+                }
+
+                break;
+            }
+            case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
+            {
+                txt_player.setString("Player 1");
+                if (btn_endPlacingP1.isMouseOver(window)) {
+                    btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
+                    if (event->is<sf::Event::MouseButtonPressed>()) {
+                        copyFieldToBattleField(player1Field, player2BattleField);
+                        if (PvE)
+                            screen = screens::BattlePlayer1;
+                        else
+                            screen = screens::FieldPlayer2;
+                    }
+                }
+                else
+                    btn_endPlacingP1.setBackColor(sf::Color());
+
+                if (btn_randomPlacing.isMouseOver(window)) {
+                    btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
+                    random = true;
+                    if (event->is<sf::Event::MouseButtonPressed>())
+                    {
+                        // Сброс позиций кораблей
+                        int i = 0;
+                        for (Ship* prop : shipsP1_container)
+                        {
+                            prop->setPosition({ 0.f + i * 250.f, 0.f });
+                            if (prop->height > prop->width) prop->wasClicked = true;
+                            ++i;
+                            prop->color = sf::Color(0, 170, 255);
+                        }
+
+                        // Пытаемся разместить случайно
+                        bool RandomSuccess = true;
+                        std::sort(shipsP1_container.begin(), shipsP1_container.end(),
+                            [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
+
+                        for (Ship* prop : shipsP1_container) {
+                            for (int attempt = 0; attempt < 1000; ++attempt) {
+                                if (!RandomPlacing(player1Field, prop, shipsP1_container)) {
+                                    break;
+                                }
+                                if (attempt == 999)
+                                    RandomSuccess = false;
+                            }
+                        }
+                        int cnt{};
+                        for (Ship* prop : shipsP1_container)
+                        {
+                            while (RandomPlacing(player1Field, prop, shipsP1_container)) {
+                                cnt++;
+                                std::cout << cnt << "\n";
+                            }
+                        }
+                        std::cout << "RandomSuccess: " << RandomSuccess << "\n";
+
+                        // Проверяем корректность
+                        if (RandomSuccess) {
+                            for (Ship* prop : shipsP1_container) {
+                                if (player1Field[0][0].checkBoundary(*prop) ||
+                                    checkCollision(prop, shipsP1_container)) {
+                                    RandomSuccess = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Если не удалось - применяем пресет
+                        if (!RandomSuccess) {
+                            // Сброс позиций
+                            i = 0;
+                            for (Ship* prop : shipsP1_container) {
+                                prop->setPosition({ 0.f + i * 250.f, 0.f });
+                                if (prop->height != 1) prop->wasClicked = true;
+                                ++i;
+                                prop->color = sf::Color(0, 170, 255);
+                            }
+
+                            // Применяем пресет
+                            RandomPresets(player1Field, shipsP1_container);
+
+                            // Обновляем индексы клеток после пресета
+                            for (Ship* ship : shipsP1_container) {
+                                for (int y = 0; y < 10; ++y) {
+                                    for (int x = 0; x < 10; ++x) {
+                                        if (player1Field[y][x].ShipisOn(*ship)) {
+                                            player1Field[y][x].setIndex(1);
+                                        }
+                                    }
+                                }
+                            }
+                            std::cout << "Preset\n";
+                        }
+                        else {
+                            std::cout << "Random\n";
                         }
                     }
-                    else
-                        btn_endPlacingP1.setBackColor(sf::Color());
+                }
+                else
+                    btn_randomPlacing.setBackColor(sf::Color());
+                break;
+            }
+            case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
+            {
+                txt_player.setString("Player 2");
+                if (btn_endPlacingP2.isMouseOver(window)) {
+                    btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
+                    if (event->is<sf::Event::MouseButtonPressed>()) {
+                        copyFieldToBattleField(player2Field, player1BattleField);
+                        screen = screens::BattlePlayer1;
 
-                    if (btn_randomPlacing.isMouseOver(window)) {
-                        btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
-                        //TODO: function that puts ships in random places and insert it here
+                    }
+                }
+                else
+                    btn_endPlacingP2.setBackColor(sf::Color());
+
+                if (btn_randomPlacing.isMouseOver(window)) {
+                    btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
+                    random = true;
+                    if (event->is<sf::Event::MouseButtonPressed>())
+                    {
+                        // Сброс позиций кораблей
+                        int i = 0;
+                        for (Ship* prop : shipsP2_container)
+                        {
+                            prop->setPosition({ 0.f + i * 250.f, 0.f });
+                            if (prop->height > prop->width) prop->wasClicked = true;
+                            ++i;
+                            prop->color = sf::Color(0, 170, 255);
+                        }
+
+                        // Пытаемся разместить случайно
+                        bool RandomSuccess = true;
+                        std::sort(shipsP2_container.begin(), shipsP2_container.end(),
+                            [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
+
+                        for (Ship* prop : shipsP2_container) {
+                            for (int attempt = 0; attempt < 1000; ++attempt) {
+                                if (!RandomPlacing(player1Field, prop, shipsP2_container)) {
+                                    break;
+                                }
+                                if (attempt == 999)
+                                    RandomSuccess = false;
+                            }
+                        }
+                        int cnt{};
+                        for (Ship* prop : shipsP2_container)
+                        {
+                            while (RandomPlacing(player1Field, prop, shipsP2_container)) {
+                                cnt++;
+                                std::cout << cnt << "\n";
+                            }
+                        }
+                        std::cout << "RandomSuccess: " << RandomSuccess << "\n";
+
+                        // Проверяем корректность
+                        if (RandomSuccess) {
+                            for (Ship* prop : shipsP2_container) {
+                                if (player1Field[0][0].checkBoundary(*prop) ||
+                                    checkCollision(prop, shipsP2_container)) {
+                                    RandomSuccess = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Если не удалось - применяем пресет
+                        if (!RandomSuccess) {
+                            // Сброс позиций
+                            i = 0;
+                            for (Ship* prop : shipsP2_container) {
+                                prop->setPosition({ 0.f + i * 250.f, 0.f });
+                                if (prop->height != 1) prop->wasClicked = true;
+                                ++i;
+                                prop->color = sf::Color(0, 170, 255);
+                            }
+
+                            // Применяем пресет
+                            RandomPresets(player1Field, shipsP2_container);
+
+                            // Обновляем индексы клеток после пресета
+                            for (Ship* ship : shipsP2_container) {
+                                for (int y = 0; y < 10; ++y) {
+                                    for (int x = 0; x < 10; ++x) {
+                                        if (player1Field[y][x].ShipisOn(*ship)) {
+                                            player1Field[y][x].setIndex(1);
+                                        }
+                                    }
+                                }
+                            }
+                            std::cout << "Preset\n";
+                        }
+                        else {
+                            std::cout << "Random\n";
+                        }
                     }
                     else
                         btn_randomPlacing.setBackColor(sf::Color());
                     break;
                 }
-                case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
+            case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
+            {
+                txt_turn.setString("Turn " + std::to_string(turnNumber));
+                txt_player.setString("Player 1");
+                if (event->is<sf::Event::MouseMoved>())
                 {
-                    txt_player.setString("Player 2");
-                    if (btn_endPlacingP2.isMouseOver(window)) {
-                        btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
-                        if (event->is<sf::Event::MouseButtonPressed>()) {
-                            copyFieldToBattleField(player2Field, player1BattleField);
-                            screen = screens::BattlePlayer1;
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                            {
+                                player1BattleField[i][j].setBackColor(sf::Color::Black);
+                            }
+                            if (player1BattleField[i][j].isMouseOver(window) &&
+                                player1BattleField[i][j].getBackColor() == sf::Color::Black)
+                            {
+                                player1BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
+                            }
                         }
                     }
-                    else
-                        btn_endPlacingP2.setBackColor(sf::Color());
+                }
+                if (event->is<sf::Event::MouseButtonPressed>())
+                {
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player1BattleField[i][j].isMouseOver(window) && player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                            {
+                                if (player1BattleField[i][j].getIndex() == 1) {
+                                    player1BattleField[i][j].setBackColor(sf::Color::Red);
+                                }
+                                else {
+                                    player1BattleField[i][j].setBackColor(sf::Color::White);
+                                    screen = screens::BattlePlayer2;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
+            {
+                txt_turn.setString("Turn " + std::to_string(turnNumber));
+                txt_player.setString("Player 2");
+                if (event->is<sf::Event::MouseMoved>())
+                {
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                            {
+                                player2BattleField[i][j].setBackColor(sf::Color::Black);
+                            }
+                            if (player2BattleField[i][j].isMouseOver(window) &&
+                                player2BattleField[i][j].getBackColor() == sf::Color::Black)
+                            {
+                                player2BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
+                            }
+                        }
+                    }
+                }
+                if (event->is<sf::Event::MouseButtonPressed>())
+                {
+                    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            if (player2BattleField[i][j].isMouseOver(window) && player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                            {
+                                if (player2BattleField[i][j].getIndex() == 1)
+                                {
+                                    player2BattleField[i][j].setBackColor(sf::Color::Red);
+                                }
+                                else
+                                {
+                                    player2BattleField[i][j].setBackColor(sf::Color::White);
+                                    screen = screens::BattlePlayer1;
+                                    turnNumber++;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            }
+            }
+            window.clear();
+            if (screen == screens::MainMenu)
+            {
+                window.draw(bg_sprite);
+                btn_PvP.drawTo(window);
+                btn_PvE.drawTo(window);
+                btn_Exit.drawTo(window);
+                window.draw(txt_PvP);
+                window.draw(txt_PvE);
+                window.draw(txt_Exit);
+            }
 
-                    if (btn_randomPlacing.isMouseOver(window)) {
-                        btn_randomPlacing.setBackColor(sf::Color(btn_col_dark));
-                        //TODO: function that puts ships in random places and insert it here
+            if (screen == screens::FieldPlayer1)
+            {
+                if (!PvE)
+                {
+                    window.draw(txt_player);
+                    window.draw(txt_placingText);
+                }
+                btn_endPlacingP1.drawTo(window);
+                window.draw(txt_endPlacingP1);
+                btn_randomPlacing.drawTo(window);
+                window.draw(txt_randomPlacing);
+                for (int i = 0; i < 10; ++i) {
+                    coordinateLetters[i].drawTo(window);
+                    coordinateNumbers[i].drawTo(window);
+                    window.draw(letters[i]);
+                    window.draw(numbers[i]);
+                    for (int j = 0; j < 10; ++j) {
+                        player1Field[i][j].drawTo(window);
                     }
+                }
+
+                //update mouse
+                mouse.Update(window);
+
+                //updating ships cycle
+                for (Ship* prop : shipsP1_container)
+                {
+                    prop->Draggable(mouse);
+                    prop->Rotatable(mouse);
+                }
+
+
+
+                for (int i{}; i < 10; i++)
+                {
+                    for (int j{}; j < 10; j++)
+                    {
+                        //aligning all ships
+                        for (Ship* prop : shipsP1_container)
+                        {
+                            player1Field[i][j].Alignbutton(mouse, *prop);
+                            //setting an index to a cell if ship is not dragged
+                            if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                            {
+                                player1Field[i][j].setIndex(1);
+                            }
+                            else
+                                player1Field[i][j].setIndex(0);
+                        }
+                    }
+                }
+
+                //checking collisions
+                for (Ship* prop : shipsP1_container)
+                {
+                    if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP1_container))
+                        prop->color = sf::Color(255, 64, 64);
                     else
-                        btn_randomPlacing.setBackColor(sf::Color()); 
-                    break;
+                    {
+                        prop->updateLastValidPosition();
+                        prop->color = sf::Color(0, 170, 255);
+                    }
                 }
-                case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
+
+                //placing if incorrect collision during placing
+                for (Ship* prop : shipsP1_container)
                 {
-                    txt_turn.setString("Turn " + std::to_string(turnNumber));
-                    txt_player.setString("Player 1");
-                    if (event->is<sf::Event::MouseMoved>())
+                    if (mouse.leftRelease)
                     {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
-                                {
-                                    player1BattleField[i][j].setBackColor(sf::Color::Black);
-                                }
-                                if (player1BattleField[i][j].isMouseOver(window) &&
-                                    player1BattleField[i][j].getBackColor() == sf::Color::Black)
-                                {
-                                    player1BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
-                                }
-                            }
-                        }
+                        if (prop->color == sf::Color(255, 64, 64))
+                            prop->revertToLastPosition();
                     }
-                    if (event->is<sf::Event::MouseButtonPressed>())
-                    {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player1BattleField[i][j].isMouseOver(window) && player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
-                                {
-                                    if (player1BattleField[i][j].getIndex() == 1) {
-                                        player1BattleField[i][j].setBackColor(sf::Color::Red);
-                                    }
-                                    else {
-                                        player1BattleField[i][j].setBackColor(sf::Color::White);
-                                        screen = screens::BattlePlayer2;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
                 }
-                case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
+
+                //aborting rotate if too close to other ships
+                for (Ship* prop : shipsP1_container)
                 {
-                    txt_turn.setString("Turn " + std::to_string(turnNumber));
-                    txt_player.setString("Player 2");
-                    if (event->is<sf::Event::MouseMoved>())
+                    if (mouse.rightRelease)
                     {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
-                                {
-                                    player2BattleField[i][j].setBackColor(sf::Color::Black);
-                                }
-                                if (player2BattleField[i][j].isMouseOver(window) &&
-                                    player2BattleField[i][j].getBackColor() == sf::Color::Black)
-                                {
-                                    player2BattleField[i][j].setBackColor(sf::Color(100, 100, 100));
-                                }
-                            }
+                        if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
+                            && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
+                            && mouse.x >= prop->x && mouse.y >= prop->y))
+                        {
+                            prop->wasClicked = true;
                         }
                     }
-                    if (event->is<sf::Event::MouseButtonPressed>())
-                    {
-                        for (int i = 0; i < 10; ++i) {
-                            for (int j = 0; j < 10; ++j) {
-                                if (player2BattleField[i][j].isMouseOver(window) && player2BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
-                                {
-                                    if (player2BattleField[i][j].getIndex() == 1)
-                                    {
-                                        player2BattleField[i][j].setBackColor(sf::Color::Red);
-                                    }
-                                    else
-                                    {
-                                        player2BattleField[i][j].setBackColor(sf::Color::White);
-                                        screen = screens::BattlePlayer1;
-                                        turnNumber++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
+                }
+
+                //drawing
+                for (Ship* prop : shipsP1_container)
+                {
+                    prop->Draw(window);
+                }
+
+                //overlap
+                for (Ship* prop : shipsP1_container)
+                {
+                    if (prop->isDragged)
+                        prop->Draw(window);
                 }
             }
-        }
-        window.clear();
-        if (screen == screens::MainMenu)
-        {
-            window.draw(bg_sprite);
-            btn_PvP.drawTo(window);
-            btn_PvE.drawTo(window);
-            btn_Exit.drawTo(window);
-            window.draw(txt_PvP);
-            window.draw(txt_PvE);
-            window.draw(txt_Exit);
-        }
 
-        if (screen == screens::FieldPlayer1)
-        {
-            if (!PvE)
+            if (screen == screens::FieldPlayer2)
             {
                 window.draw(txt_player);
                 window.draw(txt_placingText);
-            }
-            btn_endPlacingP1.drawTo(window);
-            window.draw(txt_endPlacingP1);
-            btn_randomPlacing.drawTo(window);
-            window.draw(txt_randomPlacing);
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player1Field[i][j].drawTo(window);
+                btn_endPlacingP2.drawTo(window);
+                window.draw(txt_endPlacingP2);
+                btn_randomPlacing.drawTo(window);
+                window.draw(txt_randomPlacing);
+                for (int i = 0; i < 10; ++i) {
+                    coordinateLetters[i].drawTo(window);
+                    coordinateNumbers[i].drawTo(window);
+                    window.draw(letters[i]);
+                    window.draw(numbers[i]);
+                    for (int j = 0; j < 10; ++j) {
+                        player2Field[i][j].drawTo(window);
+                    }
                 }
-            }
 
-            //update mouse
-            mouse.Update(window);
-            
-            //updating ships cycle
-            for (Ship* prop : shipsP1_container)
-            {
-                prop->Draggable(mouse);
-                prop->Rotatable(mouse);
-            }
+                //update mouse
+                mouse.Update(window);
 
-            for (int i{}; i < 10; i++)
-            {
-                for (int j{}; j < 10; j++)
+                //updating ships cycle
+                for (Ship* prop : shipsP2_container)
                 {
-                    //aligning all ships
-                    for (Ship* prop : shipsP1_container)
+                    prop->Draggable(mouse);
+                    prop->Rotatable(mouse);
+                }
+
+                for (int i{}; i < 10; i++)
+                {
+                    for (int j{}; j < 10; j++)
                     {
-                        player1Field[i][j].Alignbutton(mouse, *prop);
-                        //setting an index to a cell if ship is not dragged
-                        if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                        //aligning all ships
+                        for (Ship* prop : shipsP2_container)
                         {
-                            player1Field[i][j].setIndex(1);
-                            std::cout << "work\n";
+                            player2Field[i][j].Alignbutton(mouse, *prop);
+                            //setting an index to a cell if ship is not dragged
+                            if (player2Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                            {
+                                player2Field[i][j].setIndex(1);
+                            }
+                            else
+                                player2Field[i][j].setIndex(0);
                         }
                     }
                 }
-            } 
 
-            //checking collisions
-            for (Ship* prop : shipsP1_container)
-            {
-                if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP1_container))
-                    prop->color = sf::Color(255, 64, 64);
-                else
+                //checking collisions
+                for (Ship* prop : shipsP2_container)
                 {
-                    prop->updateLastValidPosition();
-                    prop->color = sf::Color(0, 170, 255);
-                }
-            }
-
-            //placing if incorrect collision during placing
-            for (Ship* prop : shipsP1_container)
-            {
-                if (mouse.leftRelease)
-                {
-                    if (prop->color == sf::Color(255, 64, 64))
-                        prop->revertToLastPosition();
-                }
-            }
-
-            //aborting rotate if too close to other ships
-            for (Ship* prop : shipsP1_container)
-            {
-                if (mouse.rightRelease)
-                {
-                    if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
-                        && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
-                        && mouse.x >= prop->x && mouse.y >= prop->y))
+                    if (player2Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
                     {
-                        prop->wasClicked = true;
+
+                        prop->color = sf::Color(255, 64, 64);
+                    }
+                    else
+                    {
+                        prop->updateLastValidPosition();
+                        prop->color = sf::Color(0, 170, 255);
                     }
                 }
-            }
 
-            //drawing
-            for (Ship* prop : shipsP1_container)
-            {
-                prop->Draw(window);
-            }
-
-            //overlap
-            for (Ship* prop : shipsP1_container)
-            {
-                if (prop->isDragged)
-                    prop->Draw(window);
-            }
-        }
-        
-        if (screen == screens::FieldPlayer2)
-        {
-            window.draw(txt_player);
-            window.draw(txt_placingText);
-            btn_endPlacingP2.drawTo(window);
-            window.draw(txt_endPlacingP2);
-            btn_randomPlacing.drawTo(window);
-            window.draw(txt_randomPlacing);
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player2Field[i][j].drawTo(window);
-                }
-            }
-
-            //update mouse
-            mouse.Update(window);
-
-            //updating ships cycle
-            for (Ship* prop : shipsP2_container)
-            {
-                prop->Draggable(mouse);
-                prop->Rotatable(mouse);
-            }
-
-            for (int i{}; i < 10; i++)
-            {
-                for (int j{}; j < 10; j++)
+                //placing if incorrect collision during placing
+                for (Ship* prop : shipsP2_container)
                 {
-                    //aligning all ships
-                    for (Ship* prop : shipsP2_container)
+                    if (mouse.leftRelease)
                     {
-                        player2Field[i][j].Alignbutton(mouse, *prop);
-                        //setting an index to a cell if ship is not dragged
-                        if (player2Field[i][j].ShipisOn(*prop) && !prop->isDragged)
+                        if (prop->color == sf::Color(255, 64, 64))
+                            prop->revertToLastPosition();
+                    }
+                }
+
+                //aborting rotate if too close to other ships
+                for (Ship* prop : shipsP2_container)
+                {
+                    if (mouse.rightRelease)
+                    {
+                        if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
+                            && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
+                            && mouse.x >= prop->x && mouse.y >= prop->y))
                         {
-                            player2Field[i][j].setIndex(1);
+                            prop->wasClicked = true;
                         }
                     }
                 }
-            }
 
-            //checking collisions
-            for (Ship* prop : shipsP2_container)
-            {
-                if (player2Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
-                    prop->color = sf::Color(255, 64, 64);
-                else
+                //drawing
+                for (Ship* prop : shipsP2_container)
                 {
-                    prop->updateLastValidPosition();
-                    prop->color = sf::Color(0, 170, 255);
+                    prop->Draw(window);
+                }
+
+                //overlap
+                for (Ship* prop : shipsP2_container)
+                {
+                    if (prop->isDragged)
+                        prop->Draw(window);
                 }
             }
 
-            //placing if incorrect collision during placing
-            for (Ship* prop : shipsP2_container)
+            if (screen == screens::BattlePlayer1)
             {
-                if (mouse.leftRelease)
+                if (!PvE)
                 {
-                    if (prop->color == sf::Color(255, 64, 64))
-                        prop->revertToLastPosition();
+                    window.draw(txt_player);
                 }
-            }
+                window.draw(txt_turn);
 
-            //aborting rotate if too close to other ships
-            for (Ship* prop : shipsP2_container)
-            {
-                if (mouse.rightRelease)
-                {
-                    if (prop->color == sf::Color(255, 64, 64) && (mouse.x <= prop->x + 50.f && mouse.y <= prop->y + 200.f
-                        && mouse.x >= prop->x && mouse.y >= prop->y || mouse.x <= prop->x + 200.f && mouse.y <= prop->y + 50.f
-                        && mouse.x >= prop->x && mouse.y >= prop->y))
-                    {
-                        prop->wasClicked = true;
+                for (int i = 0; i < 10; ++i) {
+                    coordinateLetters[i].drawTo(window);
+                    coordinateNumbers[i].drawTo(window);
+                    window.draw(letters[i]);
+                    window.draw(numbers[i]);
+                    for (int j = 0; j < 10; ++j) {
+                        player1BattleField[i][j].drawTo(window);
                     }
                 }
             }
-
-            //drawing
-            for (Ship* prop : shipsP2_container)
-            {
-                prop->Draw(window);
-            }
-
-            //overlap
-            for (Ship* prop : shipsP2_container)
-            {
-                if (prop->isDragged)
-                    prop->Draw(window);
-            }
-        }
-
-        if (screen == screens::BattlePlayer1)
-        {
-            if (!PvE)
+            if (screen == screens::BattlePlayer2)
             {
                 window.draw(txt_player);
-            }
-            window.draw(txt_turn);
-
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player1BattleField[i][j].drawTo(window);
+                window.draw(txt_turn);
+                for (int i = 0; i < 10; ++i) {
+                    coordinateLetters[i].drawTo(window);
+                    coordinateNumbers[i].drawTo(window);
+                    window.draw(letters[i]);
+                    window.draw(numbers[i]);
+                    for (int j = 0; j < 10; ++j) {
+                        player2BattleField[i][j].drawTo(window);
+                    }
                 }
             }
-        }
-        if (screen == screens::BattlePlayer2)
-        {
-            window.draw(txt_player);
-            window.draw(txt_turn);
-            for (int i = 0; i < 10; ++i) {
-                coordinateLetters[i].drawTo(window);
-                coordinateNumbers[i].drawTo(window);
-                window.draw(letters[i]);
-                window.draw(numbers[i]);
-                for (int j = 0; j < 10; ++j) {
-                    player2BattleField[i][j].drawTo(window);
-                }
-            }
-        }
 
-        window.display();
+            window.display();
+        }
     }
 }
