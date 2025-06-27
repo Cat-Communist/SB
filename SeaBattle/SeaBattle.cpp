@@ -488,10 +488,6 @@ int main()
                                     }
                                 }
                             }
-                            std::cout << "Preset\n";
-                        }
-                        else {
-                            std::cout << "Random\n";
                         }
                     }
                 }
@@ -578,10 +574,6 @@ int main()
                                     }
                                 }
                             }
-                            std::cout << "Preset\n";
-                        }
-                        else {
-                            std::cout << "Random\n";
                         }
                     }
                     else
@@ -1029,13 +1021,6 @@ int main()
                     player1BattleField[i][j].drawTo(window);
                 }
             }
-            for (int i = 0; i < 10; ++i) {
-                for (int j = 0; j < 10; ++j) {
-                    std::cout << player2Field[i][j].getIndex() << " ";
-                }
-                std::cout << "\n";
-            }
-            std::cout << "\n";
         }
         if (screen == screens::BattlePlayer2)
         {
