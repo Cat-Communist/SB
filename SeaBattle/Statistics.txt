@@ -1,15 +1,1 @@
 Turn 1
-Player 1 [B1] - miss.
-Player 2 [D2] - miss.
-=====================================
-Turn 2
-Player 1 [D1] - hit.
-Player 1 [C4] - hit.
-Player 1 [A3] - hit.
-Player 1 [B5] - miss.
-Player 2 [H1] - hit.
-Player 2 [H2] - hit.
-Player 2 [H3] - hit.
-Player 2 [G4] - miss.
-=====================================
-Turn 3
