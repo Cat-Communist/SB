@@ -1,1 +1,12 @@
 Turn 1
+Player 1 [B4] - miss.
+Player 2 [E3] - hit.
+Player 2 [E4] - hit.
+Player 2 [E5] - miss.
+=====================================
+Turn 2
+Player 1 [D3] - miss.
+Player 2 [C3] - miss.
+=====================================
+Turn 3
+Player 1 [E8] - miss.
