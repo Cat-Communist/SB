@@ -2,6 +2,8 @@
 #include "ScreenState.h"
 #include <iostream>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 //presets
 screens screen = screens::MainMenu;
@@ -18,9 +20,12 @@ void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]
 
 int main()
 {
+    std::ofstream statFile;
     srand(time(NULL));
     sf::RenderWindow window(sf::VideoMode({ 900, 950 }), "SeaBattle");
-    
+    std::vector<std::string> statVector;
+    std::string stringOfStat = " ";
+
     Mouse mouse;
     //ships:
     //player 1
@@ -356,17 +361,23 @@ int main()
     int shots1 = 0;
     int shots2 = 0;
 
+    static screens lastScreen = screens::MainMenu;
+
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
+            {
                 window.close();
+                statFile.close();
+            }
             switch (screen)
             {
             case screens::MainMenu:
             {
                 //handle events onMouse
+                statVector.clear();
                 PvE = false;
                 turnNumber = 1;
                 txt_turn.setString("Turn " + std::to_string(turnNumber));
@@ -414,6 +425,8 @@ int main()
                     btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
                         copyFieldToBattleField(player1Field, player2BattleField);
+                        copyFieldToBattleField(player1Field, player1CheckField);
+                        screens lastScreen = screens::FieldPlayer2;
                         if (PvE)
                             screen = screens::BattlePlayer1;
                         else
@@ -502,8 +515,9 @@ int main()
                     btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
                         copyFieldToBattleField(player2Field, player1BattleField);
+                        copyFieldToBattleField(player2Field, player2CheckField);
                         screen = screens::BattlePlayer1;
-
+                        screens lastScreen = screens::FieldPlayer2;
                     }
                 }
                 else
@@ -585,7 +599,13 @@ int main()
             case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
             {
                 txt_turn.setString("Turn " + std::to_string(turnNumber));
-                txt_player.setString("Player 1");
+                txt_player.setString("Player 1"); 
+                if (lastScreen != screens::BattlePlayer1)
+                {
+                    stringOfStat = "Turn " + std::to_string(turnNumber) + "\n";
+                    statVector.push_back(stringOfStat);
+                }
+                lastScreen = screens::BattlePlayer1;
                 if (event->is<sf::Event::MouseMoved>())
                 {
                     for (int i = 0; i < 10; ++i) {
@@ -611,21 +631,29 @@ int main()
                                 if (player1BattleField[i][j].getIndex() == 1) {
                                     player1BattleField[i][j].setBackColor(sf::Color::Red);
                                     shots1++;
+                                    stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - hit.\n";
+                                    statVector.push_back(stringOfStat);
                                     if (shots1 == 20)
                                     {
                                         screen = screens::EndGame;
                                         if (!PvE)
                                         {
                                             txt_win.setString("Player 1 win!");
+                                            stringOfStat = "Player 1 win!\n";
+                                            statVector.push_back(stringOfStat);
                                         }
                                         else
                                         {
                                             txt_win.setString("You win!");
+                                            stringOfStat = "Player win!\n";
+                                            statVector.push_back(stringOfStat);
                                         }
                                     }
                                 }
                                 else {
                                     player1BattleField[i][j].setBackColor(sf::Color::White);
+                                    stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                    statVector.push_back(stringOfStat);
                                     screen = screens::BattlePlayer2;
                                 }
                             }
@@ -640,12 +668,30 @@ int main()
                 }
                 else
                     btn_seeField.setBackColor(sf::Color());
+
+                if (btn_saveStat.isMouseOver(window)) {
+                    btn_saveStat.setBackColor(sf::Color(btn_col_dark));
+                    statFile.open("Statistics.txt", std::ios::out | std::ios::trunc);
+                    if (statFile.is_open()) {
+                        for (const auto& line : statVector) {
+                            statFile << line;
+                        }
+                        statFile.close();
+                    }
+                    else {
+                        std::cerr << "Cannot open the file.\n";
+                    }
+                }
+                else
+                    btn_saveStat.setBackColor(sf::Color());
+
                 break;
             }
             case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
             {
                 txt_turn.setString("Turn " + std::to_string(turnNumber));
                 txt_player.setString("Player 2");
+                lastScreen = screens::BattlePlayer2;
                 if (event->is<sf::Event::MouseMoved>())
                 {
                     for (int i = 0; i < 10; ++i) {
@@ -672,15 +718,23 @@ int main()
                                 {
                                     player2BattleField[i][j].setBackColor(sf::Color::Red);
                                     shots2++;
+                                    stringOfStat = "Player 2 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - hit.\n";
+                                    statVector.push_back(stringOfStat);
                                     if (shots2 == 20)
                                     {
                                         screen = screens::EndGame;
                                         txt_win.setString("Player 2 win!");
+                                        stringOfStat = "Player 2 win!\n";
+                                        statVector.push_back(stringOfStat);
                                     }
                                 }
                                 else
                                 {
                                     player2BattleField[i][j].setBackColor(sf::Color::White);
+                                    stringOfStat = "Player 2 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                    statVector.push_back(stringOfStat);
+                                    stringOfStat = "=====================================\n";
+                                    statVector.push_back(stringOfStat);
                                     screen = screens::BattlePlayer1;
                                     turnNumber++;
                                 }
@@ -696,6 +750,23 @@ int main()
                 }
                 else
                     btn_seeField.setBackColor(sf::Color());
+
+                if (btn_saveStat.isMouseOver(window)) {
+                    btn_saveStat.setBackColor(sf::Color(btn_col_dark));
+                    statFile.open("Statistics.txt", std::ios::out | std::ios::trunc);
+                    if (statFile.is_open()) {
+                        for (const auto& line : statVector) {
+                            statFile << line;
+                        }
+                        statFile.close();
+                    }
+                    else {
+                        std::cerr << "Cannot open the file.\n";
+                    }
+                }
+                else
+                    btn_saveStat.setBackColor(sf::Color());
+
                 break;
             }
             case screens::CheckField1:
@@ -759,7 +830,16 @@ int main()
                 if (btn_saveEndStat.isMouseOver(window)) {
                     btn_saveEndStat.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
-                        window.close();
+                        statFile.open("Statistics.txt", std::ios::out | std::ios::trunc);
+                        if (statFile.is_open()) {
+                            for (const auto& line : statVector) {
+                                statFile << line;
+                            }
+                            statFile.close();
+                        }
+                        else {
+                            std::cerr << "Cannot open the file.\n";
+                        }
                     }
                 }
                 else {
@@ -769,6 +849,11 @@ int main()
                 if (btn_Exit.isMouseOver(window)) {
                     btn_Exit.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
+                        statFile.open("Statistics.txt", std::ios::out | std::ios::trunc);
+                        if (statFile.is_open()) {
+                            statFile << "";
+                            statFile.close();
+                        }
                         window.close();
                     }
                 }
