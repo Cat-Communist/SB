@@ -409,15 +409,95 @@ int main()
             }
             case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
             {
-                txt_player.setString("Player 1");
+                if (PvE)
+                    txt_player.setString("Player");
+                else
+                    txt_player.setString("Player 1");
                 if (btn_endPlacingP1.isMouseOver(window)) {
                     btn_endPlacingP1.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
                         copyFieldToBattleField(player1Field, player2BattleField);
+                        copyFieldToBattleField(player1Field, player1CheckField);
+
                         if (PvE)
+                        {
                             screen = screens::BattlePlayer1;
+                            // Сброс позиций кораблей
+                            int i = 0;
+                            for (Ship* prop : shipsP2_container)
+                            {
+                                prop->setPosition({ 0.f + i * 250.f, 0.f });
+                                if (prop->height > prop->width) prop->wasClicked = true;
+                                ++i;
+                                prop->color = sf::Color(0, 170, 255);
+                            }
+
+                            // Пытаемся разместить случайно
+                            bool RandomSuccess = true;
+                            std::sort(shipsP2_container.begin(), shipsP2_container.end(),
+                                [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
+                            for (Ship* ship : shipsP2_container) {
+                                for (int attempt = 0; attempt < 1000; ++attempt) {
+                                    if (!RandomPlacing(player2Field, ship, shipsP2_container)) {
+                                        // После успешного размещения обновляем индексы
+                                        for (int y = 0; y < 10; ++y) {
+                                            for (int x = 0; x < 10; ++x) {
+                                                if (player2Field[y][x].ShipisOn(*ship)) {
+                                                    player2Field[y][x].setIndex(1);  // Помечаем клетки с кораблями
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    if (attempt == 999)
+                                        RandomSuccess = false;
+                                }
+                            }
+
+                            // Проверяем корректность
+                            if (RandomSuccess) {
+                                for (Ship* prop : shipsP2_container) {
+                                    if (player2Field[0][0].checkBoundary(*prop) ||  // Изменено с player1Field на player2Field
+                                        checkCollision(prop, shipsP2_container)) {
+                                        RandomSuccess = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Если не удалось - применяем пресет
+                            if (!RandomSuccess) {
+                                // Сброс позиций
+                                i = 0;
+                                for (Ship* prop : shipsP2_container) {
+                                    prop->setPosition({ 0.f + i * 250.f, 0.f });
+                                    if (prop->height != 1) prop->wasClicked = true;
+                                    ++i;
+                                    prop->color = sf::Color(0, 170, 255);
+                                }
+
+                                // Применяем пресет
+                                RandomPresets(player2Field, shipsP2_container);  // Изменено с player1Field на player2Field
+
+                                // Обновляем индексы клеток после пресета
+                                for (Ship* ship : shipsP2_container) {
+                                    for (int y = 0; y < 10; ++y) {
+                                        for (int x = 0; x < 10; ++x) {
+                                            if (player2Field[y][x].ShipisOn(*ship)) {  // Изменено с player1Field на player2Field
+                                                player2Field[y][x].setIndex(1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Копируем расстановку компьютера в поле для атаки игрока
+                            copyFieldToBattleField(player2Field, player1BattleField);  // Добавлено для корректной работы
+                        }
                         else
+                        {
                             screen = screens::FieldPlayer2;
+                        }
                     }
                 }
                 else
@@ -502,8 +582,8 @@ int main()
                     btn_endPlacingP2.setBackColor(sf::Color(btn_col_dark));
                     if (event->is<sf::Event::MouseButtonPressed>()) {
                         copyFieldToBattleField(player2Field, player1BattleField);
+                        copyFieldToBattleField(player2Field, player2CheckField);
                         screen = screens::BattlePlayer1;
-
                     }
                 }
                 else
@@ -531,7 +611,7 @@ int main()
 
                         for (Ship* prop : shipsP2_container) {
                             for (int attempt = 0; attempt < 1000; ++attempt) {
-                                if (!RandomPlacing(player1Field, prop, shipsP2_container)) {
+                                if (!RandomPlacing(player2Field, prop, shipsP2_container)) {
                                     break;
                                 }
                                 if (attempt == 999)
@@ -542,7 +622,7 @@ int main()
                         // Проверяем корректность
                         if (RandomSuccess) {
                             for (Ship* prop : shipsP2_container) {
-                                if (player1Field[0][0].checkBoundary(*prop) ||
+                                if (player2Field[0][0].checkBoundary(*prop) ||
                                     checkCollision(prop, shipsP2_container)) {
                                     RandomSuccess = false;
                                     break;
@@ -562,24 +642,23 @@ int main()
                             }
 
                             // Применяем пресет
-                            RandomPresets(player1Field, shipsP2_container);
+                            RandomPresets(player2Field, shipsP2_container);
 
                             // Обновляем индексы клеток после пресета
                             for (Ship* ship : shipsP2_container) {
                                 for (int y = 0; y < 10; ++y) {
                                     for (int x = 0; x < 10; ++x) {
-                                        if (player1Field[y][x].ShipisOn(*ship)) {
-                                            player1Field[y][x].setIndex(1);
+                                        if (player2Field[y][x].ShipisOn(*ship)) {
+                                            player2Field[y][x].setIndex(1);
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    else
-                        btn_randomPlacing.setBackColor(sf::Color());
-
                 }
+                else
+                    btn_randomPlacing.setBackColor(sf::Color());
                 break;
             }
             case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
@@ -606,7 +685,8 @@ int main()
                 {
                     for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
-                            if (player1BattleField[i][j].isMouseOver(window) && player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
+                            if (player1BattleField[i][j].isMouseOver(window) &&
+                                player1BattleField[i][j].getBackColor() == sf::Color(100, 100, 100))
                             {
                                 if (player1BattleField[i][j].getIndex() == 1) {
                                     player1BattleField[i][j].setBackColor(sf::Color::Red);
@@ -614,19 +694,41 @@ int main()
                                     if (shots1 == 20)
                                     {
                                         screen = screens::EndGame;
-                                        if (!PvE)
-                                        {
-                                            txt_win.setString("Player 1 win!");
-                                        }
-                                        else
-                                        {
-                                            txt_win.setString("You win!");
-                                        }
+                                        txt_win.setString("Player wins!");
                                     }
+                                    // Если попали - ход остается у игрока
                                 }
                                 else {
                                     player1BattleField[i][j].setBackColor(sf::Color::White);
-                                    screen = screens::BattlePlayer2;
+                                    // Если промахнулись - ход переходит к компьютеру
+                                    if (PvE) {
+                                        // Ждем немного перед ходом компьютера
+                                        sf::sleep(sf::milliseconds(500));
+                                        RandomShot(mouse, player2BattleField);
+                                        // Обрабатываем выстрел компьютера
+                                        for (int i = 0; i < 10; ++i) {
+                                            for (int j = 0; j < 10; ++j) {
+                                                if (player2BattleField[i][j].getPosition() == sf::Vector2f(mouse.x, mouse.y)) {
+                                                    if (player2BattleField[i][j].getIndex() == 1) {
+                                                        player2BattleField[i][j].setBackColor(sf::Color::Red);
+                                                        shots2++;
+                                                        if (shots2 == 20) {
+                                                            screen = screens::EndGame;
+                                                            txt_win.setString("Computer wins!");
+                                                        }
+                                                        // Если компьютер попал - он ходит снова
+                                                        sf::sleep(sf::milliseconds(500));
+                                                        RandomShot(mouse, player2BattleField);
+                                                    }
+                                                    else {
+                                                        player2BattleField[i][j].setBackColor(sf::Color::White);
+                                                        // Если компьютер промахнулся - ход переходит к игроку
+                                                        turnNumber++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1089,7 +1191,6 @@ int main()
             window.draw(txt_Exit);
             window.draw(txt_win);
         }
-
         window.display();
     }
 }

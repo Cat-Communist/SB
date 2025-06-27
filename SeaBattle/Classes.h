@@ -607,3 +607,27 @@ void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
     }
     }
 }
+
+void RandomShot(Mouse& mouse, BattleCell field[10][10])
+{
+    std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<> dist(0, 9);
+    bool full = true;
+    int random_x;
+    int random_y;
+    while(full)
+    {
+        random_x = dist(gen);
+        random_y = dist(gen);
+        if (field[random_x][random_y].getBackColor() != sf::Color::White || 
+            field[random_x][random_y].getBackColor() != sf::Color::Red)
+        {
+            full = false;
+        }
+    }
+    
+    mouse.x = field[random_x][random_y].getPosition().x;
+    mouse.y = field[random_x][random_y].getPosition().y;
+
+    mouse.leftRelease = true;
+}
