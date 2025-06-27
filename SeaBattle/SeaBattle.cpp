@@ -721,11 +721,15 @@ int main()
                                 }
                                 else {
                                     player1BattleField[i][j].setBackColor(sf::Color::White);
-                                    stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
-                                    statVector.push_back(stringOfStat);
-                                    screen = screens::BattlePlayer2;
+                                    if (!PvE)
+                                    {
+                                        screen = screens::BattlePlayer2;
+                                        stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                        statVector.push_back(stringOfStat);
+                                    }
                                     // Если промахнулись - ход переходит к компьютеру
-                                    if (PvE) {
+
+                                    else {
                                         bool missed = false;
                                         while (!missed)
                                         {
@@ -745,9 +749,8 @@ int main()
                                                             }
                                                         }
                                                         else {
-                                                            missed = true;
                                                             player2BattleField[i][j].setBackColor(sf::Color::White);
-                                                            screen == screens::BattlePlayer2;
+                                                            missed = true;
                                                             // Если компьютер промахнулся - ход переходит к игроку
                                                             turnNumber++;
                                                         }
@@ -755,10 +758,6 @@ int main()
                                                 }
                                             }
                                         }
-                                    }
-                                    else
-                                    {
-
                                     }
                                 }
                             }
