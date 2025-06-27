@@ -619,7 +619,7 @@ void RandomShot(Mouse& mouse, BattleCell field[10][10])
     {
         random_x = dist(gen);
         random_y = dist(gen);
-        if (field[random_x][random_y].getBackColor() != sf::Color::White || 
+        if (field[random_x][random_y].getBackColor() != sf::Color::White &&
             field[random_x][random_y].getBackColor() != sf::Color::Red)
         {
             full = false;
@@ -630,4 +630,6 @@ void RandomShot(Mouse& mouse, BattleCell field[10][10])
     mouse.y = field[random_x][random_y].getPosition().y;
 
     mouse.leftRelease = true;
+    std::cout << random_x << " " << random_y << "\n";
+
 }
