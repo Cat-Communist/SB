@@ -700,30 +700,37 @@ int main()
                                 }
                                 else {
                                     player1BattleField[i][j].setBackColor(sf::Color::White);
+                                    if (!PvE)
+                                    {
+                                        screen = screens::BattlePlayer2;
+                                    }
                                     // Если промахнулись - ход переходит к компьютеру
-                                    if (PvE) {
-                                        // Ждем немного перед ходом компьютера
-                                        sf::sleep(sf::milliseconds(500));
-                                        RandomShot(mouse, player2BattleField);
-                                        // Обрабатываем выстрел компьютера
-                                        for (int i = 0; i < 10; ++i) {
-                                            for (int j = 0; j < 10; ++j) {
-                                                if (player2BattleField[i][j].getPosition() == sf::Vector2f(mouse.x, mouse.y)) {
-                                                    if (player2BattleField[i][j].getIndex() == 1) {
-                                                        player2BattleField[i][j].setBackColor(sf::Color::Red);
-                                                        shots2++;
-                                                        if (shots2 == 20) {
-                                                            screen = screens::EndGame;
-                                                            txt_win.setString("Computer wins!");
+
+                                    else {
+                                        bool missed = false;
+                                        while (!missed)
+                                        {
+                                            // Ждем немного перед ходом компьютера
+                                            sf::sleep(sf::milliseconds(500));
+                                            RandomShot(mouse, player2BattleField);
+                                            // Обрабатываем выстрел компьютера
+                                            for (int i = 0; i < 10; ++i) {
+                                                for (int j = 0; j < 10; ++j) {
+                                                    if (player2BattleField[i][j].getPosition() == sf::Vector2f(mouse.x, mouse.y)) {
+                                                        if (player2BattleField[i][j].getIndex() == 1) {
+                                                            player2BattleField[i][j].setBackColor(sf::Color::Red);
+                                                            shots2++;
+                                                            if (shots2 == 20) {
+                                                                screen = screens::EndGame;
+                                                                txt_win.setString("Computer wins!");
+                                                            }
                                                         }
-                                                        // Если компьютер попал - он ходит снова
-                                                        sf::sleep(sf::milliseconds(500));
-                                                        RandomShot(mouse, player2BattleField);
-                                                    }
-                                                    else {
-                                                        player2BattleField[i][j].setBackColor(sf::Color::White);
-                                                        // Если компьютер промахнулся - ход переходит к игроку
-                                                        turnNumber++;
+                                                        else {
+                                                            player2BattleField[i][j].setBackColor(sf::Color::White);
+                                                            missed = true;
+                                                            // Если компьютер промахнулся - ход переходит к игроку
+                                                            turnNumber++;
+                                                        }
                                                     }
                                                 }
                                             }
