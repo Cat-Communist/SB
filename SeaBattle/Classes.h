@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include "ScreenState.h"
 
+//Vadim
 class Mouse
 {
 public:
@@ -107,8 +108,6 @@ public:
     //states
     bool isDragged = false;
     bool wasClicked = false;
-    sf::Clock collisionFlashClock; // Таймер для мигания красным цветом
-    bool isCollisionFlash = false;
 
     //decor
     sf::Color color;
@@ -124,10 +123,12 @@ public:
         rect.setPosition({x, y});
     }
 
+    //Vadim
     sf::Vector2f getPosition() const {
         return sf::Vector2f(x, y);
     }
 
+    //Vadim
     bool isInside(float x, float y)
     {
         if (x > this->x && x < this->x + width
@@ -136,7 +137,7 @@ public:
         return false;
     }
 
-    //makes shape draggable
+    //makes shape draggable (Vadim)
     void Draggable(Mouse& mouse)
     {
         if (mouse.leftPress && isInside(mouse.x, mouse.y))
@@ -156,7 +157,7 @@ public:
         rect.setPosition({ x,y });
     }
 
-    //draws shape and refreshes its position 
+    //draws shape and refreshes its position (Vadim)
     void Draw(sf::RenderWindow& window)
     {
         rect.setSize({ width, height });
@@ -165,7 +166,7 @@ public:
         window.draw(rect);
     }
 
-    //swaps sides of a shape
+    //swaps sides of a shape (Vadim)
     void swapSides(float& w, float& h)
     {
         float temp = w;
@@ -173,7 +174,7 @@ public:
         h = temp;
     }
 
-    //makes shape rotatable
+    //makes shape rotatable (Vadim)
     void Rotatable(Mouse& mouse)
     {
         if (!isDragged) //if not dragged
@@ -188,12 +189,6 @@ public:
                 swapSides(width, height);
             }
         }
-    }
-
-    //gets origin of shape
-    sf::Vector2f getOrigin()
-    {
-        return rect.getOrigin();
     }
 
     //sets position of shape
