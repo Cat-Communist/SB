@@ -345,12 +345,9 @@ int main()
     txt_backToBattle.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
     txt_backToBattle.setPosition({ 450, 800 });
 
-    sf::Text txt_win(arial, "Player 1 win");
+    sf::Text txt_win(arial, " ");
     txt_win.setCharacterSize(100);
-    txt_bounds = txt_win.getGlobalBounds();
     txt_win.setFillColor(sf::Color::White);
-    txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-    txt_win.setPosition({ 450, 225 });
 
     sf::Text txt_saveEndStat(arial, "Save statistics");
     txt_bounds = txt_saveEndStat.getGlobalBounds();
@@ -713,7 +710,6 @@ int main()
                                     statVector.push_back(stringOfStat);
                                     if (shots1 == 20)
                                     {
-                                        screen = screens::EndGame;
                                         if (!PvE)
                                         {
                                             txt_win.setString("Player 1 win!");
@@ -722,17 +718,63 @@ int main()
                                         }
                                         else
                                         {
-                                            txt_win.setString("You win!");
+                                            txt_win.setString("Player win!");
                                             stringOfStat = "Player win!\n";
                                             statVector.push_back(stringOfStat);
                                         }
+                                        screen = screens::EndGame;
                                     }
                                 }
                                 else {
                                     player1BattleField[i][j].setBackColor(sf::Color::White);
-                                    stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
-                                    statVector.push_back(stringOfStat);
-                                    screen = screens::BattlePlayer2;
+                                    if (!PvE)
+                                    {
+                                        screen = screens::BattlePlayer2;
+                                        stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                        statVector.push_back(stringOfStat);
+                                    }
+                                    // Если промахнулись - ход переходит к компьютеру
+
+                                    else {
+                                        lastScreen = screens::BattlePlayer2;
+                                        bool missed = false;
+                                        stringOfStat = "Player [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                        statVector.push_back(stringOfStat);
+                                        while (!missed)
+                                        {
+                                            sf::sleep(sf::milliseconds(500));
+                                            RandomShot(mouse, player2BattleField);
+                                            for (int i = 0; i < 10; ++i) {
+                                                for (int j = 0; j < 10; ++j) {
+                                                    if (player2BattleField[i][j].getPosition() == sf::Vector2f(mouse.x, mouse.y)) {
+                                                        if (player2BattleField[i][j].getIndex() == 1) {
+                                                            player2BattleField[i][j].setBackColor(sf::Color::Red);
+                                                            shots2++;
+
+                                                            stringOfStat = "Computer [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - hit.\n";
+                                                            statVector.push_back(stringOfStat);
+                                                            if (shots2 == 20)
+                                                            {
+                                                                txt_win.setString("Computer win!");
+                                                                stringOfStat = "Computer win!\n";
+                                                                statVector.push_back(stringOfStat);
+                                                                screen = screens::EndGame;
+                                                            }
+                                                        }
+                                                        else {
+                                                            player2BattleField[i][j].setBackColor(sf::Color::White);
+                                                            missed = true;
+                                                            stringOfStat = "Computer [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
+                                                            statVector.push_back(stringOfStat);
+                                                            stringOfStat = "=====================================\n";
+                                                            statVector.push_back(stringOfStat);
+                                                            turnNumber++;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -762,6 +804,10 @@ int main()
                 }
                 else
                     btn_saveStat.setBackColor(sf::Color());
+
+                txt_bounds = txt_win.getGlobalBounds();
+                txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+                txt_win.setPosition(center - step);
 
                 break;
             }
@@ -800,10 +846,10 @@ int main()
                                     statVector.push_back(stringOfStat);
                                     if (shots2 == 20)
                                     {
-                                        screen = screens::EndGame;
                                         txt_win.setString("Player 2 win!");
                                         stringOfStat = "Player 2 win!\n";
                                         statVector.push_back(stringOfStat);
+                                        screen = screens::EndGame;
                                     }
                                 }
                                 else
@@ -844,6 +890,10 @@ int main()
                 }
                 else
                     btn_saveStat.setBackColor(sf::Color());
+
+                txt_bounds = txt_win.getGlobalBounds();
+                txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
+                txt_win.setPosition(center - step);
 
                 break;
             }
@@ -943,6 +993,7 @@ int main()
             }
         }
         window.clear();
+
         if (screen == screens::MainMenu)
         {
             window.draw(bg_sprite);
