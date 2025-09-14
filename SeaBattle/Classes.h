@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include "ScreenState.h"
 
-//Vadim
+//Cat-communist
 class Mouse
 {
 public:
@@ -123,12 +123,12 @@ public:
         rect.setPosition({x, y});
     }
 
-    //Vadim
+    //Cat_communist
     sf::Vector2f getPosition() const {
         return sf::Vector2f(x, y);
     }
 
-    //Vadim
+    //Cat_communist
     bool isInside(float x, float y)
     {
         if (x > this->x && x < this->x + width
@@ -137,7 +137,7 @@ public:
         return false;
     }
 
-    //makes shape draggable (Vadim)
+    //makes shape draggable (Cat_communist)
     void Draggable(Mouse& mouse)
     {
         if (mouse.leftPress && isInside(mouse.x, mouse.y))
@@ -157,7 +157,7 @@ public:
         rect.setPosition({ x,y });
     }
 
-    //draws shape and refreshes its position (Vadim)
+    //draws shape and refreshes its position (Cat_communist)
     void Draw(sf::RenderWindow& window)
     {
         rect.setSize({ width, height });
@@ -166,7 +166,7 @@ public:
         window.draw(rect);
     }
 
-    //swaps sides of a shape (Vadim)
+    //swaps sides of a shape (Cat_communist)
     void swapSides(float& w, float& h)
     {
         float temp = w;
@@ -174,7 +174,7 @@ public:
         h = temp;
     }
 
-    //makes shape rotatable (Vadim)
+    //makes shape rotatable (Cat_communist)
     void Rotatable(Mouse& mouse)
     {
         if (!isDragged) //if not dragged
@@ -191,7 +191,7 @@ public:
         }
     }
 
-    //sets position of shape
+    //sets position of shape (Cat_communist)
     void setPosition(sf::Vector2f pos)
     {
         x = pos.x;
@@ -207,10 +207,8 @@ public:
             last = { rect.getPosition().x, rect.getPosition().y };
         }
     }
-    
-    bool waiting = false;
 
-    //go back to last
+    //go back to last (Cat_communist)
     void revertToLastPosition() 
     {
         x = last.x;
@@ -241,23 +239,24 @@ public:
         button.setOutlineThickness(1.f);
     }
 
-    //setting the button background color
+    //setting the button background color (Flarishon)
     void setBackColor(sf::Color color)
     {
         button.setFillColor(color);
     }
 
+    //(Flarishon)
     sf::Color getBackColor() const {
         return button.getFillColor();
     }
 
-    //setting the button outline color
+    //setting the button outline color (Flarishon)
     void setLineColor(sf::Color color)
     {
         button.setOutlineColor(color);
     }
 
-    //setting the position of the button
+    //setting the position of the button (Flarishon)
     void setPosition(sf::Vector2f pos)
     {
         button.setPosition(pos);
@@ -281,7 +280,7 @@ public:
         window.draw(button);
     }
 
-    //check if mouse is over the button
+    //check if mouse is over the button (Flarishon)
     bool isMouseOver(sf::RenderWindow& window)
     {
         int mouseX = sf::Mouse::getPosition(window).x;
@@ -300,16 +299,19 @@ public:
         return false;
     }
 
+    //(Flarishon)
     void setIndex(int newIndex)
     {
         index = newIndex;
     }
 
+    //(Flarishon)
     int getIndex() const
     {
         return index;
     }
 
+    //(Cat-Communist)
     bool MouseisInside(float x, float y)
     {
         if (x > this->x && x < this->x + button_size
@@ -319,7 +321,8 @@ public:
         }
         return false;
     }
-
+    
+    //(Cat-Communist)
     void Alignbutton(Mouse& mouse, Ship& rect)
     {
         if (rect.isDragged && MouseisInside(mouse.x, mouse.y))
@@ -332,7 +335,8 @@ public:
                 rect.setPosition(button.getPosition() - sf::Vector2f{ floor(rect.offset_x / 50) * button_size, 0 });
         }
     }
-    //use only with battle_cell[0][0]
+
+    //use only with battle_cell[0][0] (Cat-Communist)
     bool checkBoundary(Ship& ship)
     {
         float global_border_x0 = button.getPosition().x;
@@ -351,6 +355,7 @@ public:
         return false;
     }
 
+    //(Cat-Communist)
     bool ShipisOn(Ship rect)
     {
         if (button.getPosition().x >= rect.x && button.getPosition().x < rect.x + rect.width
@@ -434,7 +439,7 @@ private:
     sf::RectangleShape button;
 };
 
-//functions
+//functions (Cat-Communist)
 bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
     for (const Ship* otherShip : otherShips) {
         if (currentShip == otherShip)
@@ -472,6 +477,7 @@ bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
     return false;
 }
 
+//(Cat-Communist)
 bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> otherShips)
 {
     srand(time(NULL));
@@ -500,6 +506,7 @@ bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> othe
     return false;
 }
 
+//(Cat-Communist)
 void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
 {
     std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
@@ -603,6 +610,7 @@ void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
     }
 }
 
+//Cat-Communist)
 void RandomShot(Mouse& mouse, BattleCell field[10][10])
 {
     std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
