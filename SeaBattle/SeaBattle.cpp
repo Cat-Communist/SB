@@ -714,14 +714,16 @@ int main()
                                         {
                                             txt_win.setString("Player 1 win!");
                                             stringOfStat = "Player 1 win!\n";
-                                            statVector.push_back(stringOfStat);
                                         }
                                         else
                                         {
                                             txt_win.setString("Player win!");
                                             stringOfStat = "Player win!\n";
-                                            statVector.push_back(stringOfStat);
                                         }
+                                        sf::FloatRect winBounds = txt_win.getGlobalBounds();
+                                        txt_win.setOrigin({ winBounds.getCenter().x, winBounds.getCenter().y });
+                                        txt_win.setPosition(center - step);
+                                        statVector.push_back(stringOfStat);
                                         screen = screens::EndGame;
                                     }
                                 }
@@ -757,6 +759,9 @@ int main()
                                                             {
                                                                 txt_win.setString("Computer win!");
                                                                 stringOfStat = "Computer win!\n";
+                                                                sf::FloatRect winBounds = txt_win.getGlobalBounds();
+                                                                txt_win.setOrigin({ winBounds.getCenter().x, winBounds.getCenter().y });
+                                                                txt_win.setPosition(center - step);
                                                                 statVector.push_back(stringOfStat);
                                                                 screen = screens::EndGame;
                                                             }
@@ -805,10 +810,6 @@ int main()
                 else
                     btn_saveStat.setBackColor(sf::Color());
 
-                txt_bounds = txt_win.getGlobalBounds();
-                txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-                txt_win.setPosition(center - step);
-
                 break;
             }
             case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
@@ -848,6 +849,9 @@ int main()
                                     {
                                         txt_win.setString("Player 2 win!");
                                         stringOfStat = "Player 2 win!\n";
+                                        sf::FloatRect winBounds = txt_win.getGlobalBounds();
+                                        txt_win.setOrigin({ winBounds.getCenter().x, winBounds.getCenter().y });
+                                        txt_win.setPosition(center - step);
                                         statVector.push_back(stringOfStat);
                                         screen = screens::EndGame;
                                     }
@@ -890,10 +894,6 @@ int main()
                 }
                 else
                     btn_saveStat.setBackColor(sf::Color());
-
-                txt_bounds = txt_win.getGlobalBounds();
-                txt_win.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
-                txt_win.setPosition(center - step);
 
                 break;
             }
