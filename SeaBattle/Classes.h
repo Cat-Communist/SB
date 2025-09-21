@@ -20,12 +20,10 @@ public:
     bool leftRelease;
     bool rightPress;
     bool rightRelease;
-    bool rightisDown;
 
 public:
     void Update(sf::RenderWindow& window)
     {
-
         //reset states
         leftPress = false;
         leftRelease = false;
@@ -53,12 +51,10 @@ public:
             if (!right_click)
             {
                 rightPress = true;
-                rightisDown = true;
             }
             else
             {
                 rightPress = false;
-                rightisDown = true;
             }
             right_click = true;
         }
@@ -67,7 +63,6 @@ public:
             if (right_click)
             {
                 rightRelease = true;
-                rightisDown = false;
             }
             right_click = false;
         }
@@ -77,7 +72,7 @@ public:
     void Reset() {
         x = y = -1000;
         left_click = false;
-        right_click = false;
+        right_click = false; 
         leftPress = false;
         leftRelease = false;
         rightPress = false;
@@ -456,8 +451,8 @@ bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
             return true;
         }
 
-        // Проверка расстояния (минимум 1 клетка между кораблями)
-        // Расширенная область проверки (текущий корабль + 1 клетка вокруг)
+        // Проверка расстояния 
+        // Область вокруг корабля
         float expandedLeft = currentShip->x - currentShip->cell;
         float expandedRight = currentShip->x + currentShip->width + currentShip->cell;
         float expandedTop = currentShip->y - currentShip->cell;
@@ -499,7 +494,6 @@ bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> othe
 
     if (field[0][0].checkBoundary(*ship) || checkCollision(ship, otherShips))
     {
-        
         return true;
     }
 

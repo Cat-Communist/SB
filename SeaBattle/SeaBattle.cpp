@@ -10,6 +10,7 @@ screens screen = screens::MainMenu;
 sf::Font arial("FONTS/arialmt.ttf");
 bool random = false;
 
+//Flarishon
 void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]) {
     for (int i = 0; i < 10; ++i) {
         for (int j = 0; j < 10; ++j) {
