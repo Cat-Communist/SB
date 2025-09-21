@@ -435,7 +435,7 @@ private:
 };
 
 //functions (Cat-Communist)
-bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
+inline bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
     for (const Ship* otherShip : otherShips) {
         if (currentShip == otherShip)
             continue;
@@ -473,7 +473,7 @@ bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
 }
 
 //(Cat-Communist)
-bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> otherShips)
+inline bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> otherShips)
 {
     srand(time(NULL));
 
@@ -501,7 +501,7 @@ bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> othe
 }
 
 //(Cat-Communist)
-void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
+inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
 {
     std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<> dist(1, 5);
@@ -605,7 +605,7 @@ void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShips)
 }
 
 //Cat-Communist)
-void RandomShot(Mouse& mouse, BattleCell field[10][10])
+inline void RandomShot(Mouse& mouse, BattleCell field[10][10])
 {
     std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<> dist(0, 9);
