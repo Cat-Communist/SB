@@ -441,8 +441,6 @@ int main()
                                 prop->color = sf::Color(0, 170, 255);
                             }
 
-                            // Пытаемся разместить случайно
-                            bool RandomSuccess = true;
                             std::sort(shipsP2_container.begin(), shipsP2_container.end(),
                                 [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
                             for (Ship* ship : shipsP2_container) {
@@ -458,50 +456,18 @@ int main()
                                         }
                                         break;
                                     }
-                                    if (attempt == 999)
-                                        RandomSuccess = false;
                                 }
                             }
 
-                            // Проверяем корректность
-                            if (RandomSuccess) {
-                                for (Ship* prop : shipsP2_container) {
-                                    if (player2Field[0][0].checkBoundary(*prop) ||  // Изменено с player1Field на player2Field
-                                        checkCollision(prop, shipsP2_container)) {
-                                        RandomSuccess = false;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Если не удалось - применяем пресет
-                            if (!RandomSuccess) {
-                                // Сброс позиций
-                                i = 0;
-                                for (Ship* prop : shipsP2_container) {
-                                    prop->setPosition({ 0.f + i * 250.f, 0.f });
-                                    if (prop->height != 1) prop->wasClicked = true;
-                                    ++i;
-                                    prop->color = sf::Color(0, 170, 255);
-                                }
-
-                                // Применяем пресет
-                                RandomPresets(player2Field, shipsP2_container);  // Изменено с player1Field на player2Field
-
-                                // Обновляем индексы клеток после пресета
-                                for (Ship* ship : shipsP2_container) {
-                                    for (int y = 0; y < 10; ++y) {
-                                        for (int x = 0; x < 10; ++x) {
-                                            if (player2Field[y][x].ShipisOn(*ship)) {  // Изменено с player1Field на player2Field
-                                                player2Field[y][x].setIndex(1);
-                                            }
-                                        }
-                                    }
+                            for (Ship* prop : shipsP2_container) {
+                                if (player2Field[0][0].checkBoundary(*prop) ||
+                                    checkCollision(prop, shipsP2_container)) {
+                                    break;
                                 }
                             }
 
                             // Копируем расстановку компьютера в поле для атаки игрока
-                            copyFieldToBattleField(player2Field, player1BattleField);  // Добавлено для корректной работы
+                            copyFieldToBattleField(player2Field, player1BattleField); 
                         }
                         else
                         {
@@ -527,8 +493,6 @@ int main()
                             prop->color = sf::Color(0, 170, 255);
                         }
 
-                        // Пытаемся разместить случайно
-                        bool RandomSuccess = true;
                         std::sort(shipsP1_container.begin(), shipsP1_container.end(),
                             [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
 
@@ -537,45 +501,13 @@ int main()
                                 if (!RandomPlacing(player1Field, prop, shipsP1_container)) {
                                     break;
                                 }
-                                if (attempt == 999)
-                                    RandomSuccess = false;
                             }
                         }
 
-                        // Проверяем корректность
-                        if (RandomSuccess) {
-                            for (Ship* prop : shipsP1_container) {
-                                if (player1Field[0][0].checkBoundary(*prop) ||
-                                    checkCollision(prop, shipsP1_container)) {
-                                    RandomSuccess = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Если не удалось - применяем пресет
-                        if (!RandomSuccess) {
-                            // Сброс позиций
-                            i = 0;
-                            for (Ship* prop : shipsP1_container) {
-                                prop->setPosition({ 0.f + i * 250.f, 0.f });
-                                if (prop->height != 1) prop->wasClicked = true;
-                                ++i;
-                                prop->color = sf::Color(0, 170, 255);
-                            }
-
-                            // Применяем пресет
-                            RandomPresets(player1Field, shipsP1_container);
-
-                            // Обновляем индексы клеток после пресета
-                            for (Ship* ship : shipsP1_container) {
-                                for (int y = 0; y < 10; ++y) {
-                                    for (int x = 0; x < 10; ++x) {
-                                        if (player1Field[y][x].ShipisOn(*ship)) {
-                                            player1Field[y][x].setIndex(1);
-                                        }
-                                    }
-                                }
+                        for (Ship* prop : shipsP1_container) {
+                            if (player1Field[0][0].checkBoundary(*prop) ||
+                                checkCollision(prop, shipsP1_container)) {
+                                break;
                             }
                         }
                     }
@@ -615,7 +547,6 @@ int main()
                         }
 
                         // Пытаемся разместить случайно
-                        bool RandomSuccess = true;
                         std::sort(shipsP2_container.begin(), shipsP2_container.end(),
                             [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
 
@@ -624,45 +555,13 @@ int main()
                                 if (!RandomPlacing(player2Field, prop, shipsP2_container)) {
                                     break;
                                 }
-                                if (attempt == 999)
-                                    RandomSuccess = false;
                             }
                         }
 
-                        // Проверяем корректность
-                        if (RandomSuccess) {
-                            for (Ship* prop : shipsP2_container) {
-                                if (player2Field[0][0].checkBoundary(*prop) ||
-                                    checkCollision(prop, shipsP2_container)) {
-                                    RandomSuccess = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Если не удалось - применяем пресет
-                        if (!RandomSuccess) {
-                            // Сброс позиций
-                            i = 0;
-                            for (Ship* prop : shipsP2_container) {
-                                prop->setPosition({ 0.f + i * 250.f, 0.f });
-                                if (prop->height != 1) prop->wasClicked = true;
-                                ++i;
-                                prop->color = sf::Color(0, 170, 255);
-                            }
-
-                            // Применяем пресет
-                            RandomPresets(player2Field, shipsP2_container);
-
-                            // Обновляем индексы клеток после пресета
-                            for (Ship* ship : shipsP2_container) {
-                                for (int y = 0; y < 10; ++y) {
-                                    for (int x = 0; x < 10; ++x) {
-                                        if (player2Field[y][x].ShipisOn(*ship)) {
-                                            player2Field[y][x].setIndex(1);
-                                        }
-                                    }
-                                }
+                        for (Ship* prop : shipsP2_container) {
+                            if (player2Field[0][0].checkBoundary(*prop) ||
+                                checkCollision(prop, shipsP2_container)) {
+                                break;
                             }
                         }
                     }

@@ -514,7 +514,6 @@ inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShip
     {
     case 1:
     {
-        std::cout << "1\n";
         (*(iter + i++))->setPosition(field[4][0].getPosition());
         (*(iter + i++))->setPosition(field[9][3].getPosition());
         (*(iter + i++))->setPosition(field[9][9].getPosition());
@@ -532,7 +531,6 @@ inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShip
     }
     case 2:
     {
-        std::cout << "2\n";
         (*(iter + i++))->setPosition(field[1][1].getPosition());
         (*(iter + i++))->setPosition(field[3][3].getPosition());
         (*(iter + i++))->setPosition(field[5][5].getPosition());
@@ -550,7 +548,6 @@ inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShip
     }
     case 3:
     {
-        std::cout << "3\n";
         (*(iter + i++))->setPosition(field[0][2].getPosition());
         (*(iter + i++))->setPosition(field[2][4].getPosition());
         (*(iter + i++))->setPosition(field[4][6].getPosition());
@@ -568,7 +565,6 @@ inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShip
     }
     case 4:
     {
-        std::cout << "4\n";
         (*(iter + i++))->setPosition(field[0][1].getPosition());
         (*(iter + i++))->setPosition(field[2][3].getPosition());
         (*(iter + i++))->setPosition(field[4][5].getPosition());
@@ -586,7 +582,6 @@ inline void RandomPresets(BattleCell field[10][10], std::vector<Ship*> otherShip
     }
     case 5:
     {
-        std::cout << "5\n";
         (*(iter + i++))->setPosition(field[0][3].getPosition()); std::cout << (*iter)->getPosition().x;
         (*(iter + i++))->setPosition(field[2][5].getPosition());
         (*(iter + i++))->setPosition(field[4][7].getPosition());
