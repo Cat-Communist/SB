@@ -6,14 +6,11 @@
 #include <SFML/Graphics.hpp>
 #include "ScreenState.h"
 
-//Cat-communist
 class Mouse
 {
 public:
-    //mouse position
     float x, y;
 
-    //states
     bool left_click;
     bool right_click;
     bool leftPress;
@@ -24,7 +21,6 @@ public:
 public:
     void Update(sf::RenderWindow& window)
     {
-        //reset states
         leftPress = false;
         leftRelease = false;
         rightPress = false;
@@ -83,33 +79,26 @@ public:
 class Ship
 {
 public:
-    //position 
     float x = 0.f;
     float y = 0.f;
 
-    //last valid position
     sf::Vector2f last;
 
-    //size
-    int decks; //amount of cells
-    float cell = 50.f; //one cell size
+    int decks;
+    float cell = 50.f;
     float height = cell;
     float width;
 
-    //offsets
     float offset_x = 0.f;
     float offset_y = 0.f;
 
-    //states
     bool isDragged = false;
     bool wasClicked = false;
 
-    //decor
     sf::Color color;
 private:
     sf::RectangleShape rect;
 public:
-    //constructor
     Ship(int decks, sf::Vector2f pos, sf::Color col)
         : decks(decks), x(pos.x), y(pos.y), color(col), last(pos), width(decks * cell)
     {
@@ -118,12 +107,10 @@ public:
         rect.setPosition({x, y});
     }
 
-    //Cat_communist
     sf::Vector2f getPosition() const {
         return sf::Vector2f(x, y);
     }
 
-    //Cat_communist
     bool isInside(float x, float y)
     {
         if (x > this->x && x < this->x + width
@@ -132,7 +119,6 @@ public:
         return false;
     }
 
-    //makes shape draggable (Cat_communist)
     void Draggable(Mouse& mouse)
     {
         if (mouse.leftPress && isInside(mouse.x, mouse.y))
@@ -152,7 +138,6 @@ public:
         rect.setPosition({ x,y });
     }
 
-    //draws shape and refreshes its position (Cat_communist)
     void Draw(sf::RenderWindow& window)
     {
         rect.setSize({ width, height });
@@ -161,7 +146,6 @@ public:
         window.draw(rect);
     }
 
-    //swaps sides of a shape (Cat_communist)
     void swapSides(float& w, float& h)
     {
         float temp = w;
@@ -169,10 +153,9 @@ public:
         h = temp;
     }
 
-    //makes shape rotatable (Cat_communist)
     void Rotatable(Mouse& mouse)
     {
-        if (!isDragged) //if not dragged
+        if (!isDragged)
         {
             if (wasClicked)
             {
@@ -186,7 +169,6 @@ public:
         }
     }
 
-    //sets position of shape (Cat_communist)
     void setPosition(sf::Vector2f pos)
     {
         x = pos.x;
@@ -194,7 +176,6 @@ public:
         rect.setPosition({ x,y });
     }
 
-    //updating last valid position
     void updateLastValidPosition()
     {
         if (color == sf::Color(0, 170, 255))
@@ -203,7 +184,6 @@ public:
         }
     }
 
-    //go back to last (Cat_communist)
     void revertToLastPosition() 
     {
         x = last.x;
@@ -216,15 +196,13 @@ public:
 
 class BattleCell {
 public:
-    //position
     float x = 0.f;
     float y = 0.f;
 
-    //size of button
     int button_size = 50.f;
 public:
     BattleCell() = default;
-    //cunstructor of the battlecel, setting initial size, background color and outline color
+
     BattleCell(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor, int index)
         : index(index)
     {
@@ -234,24 +212,20 @@ public:
         button.setOutlineThickness(1.f);
     }
 
-    //setting the button background color (Flarishon)
     void setBackColor(sf::Color color)
     {
         button.setFillColor(color);
     }
 
-    //(Flarishon)
     sf::Color getBackColor() const {
         return button.getFillColor();
     }
 
-    //setting the button outline color (Flarishon)
     void setLineColor(sf::Color color)
     {
         button.setOutlineColor(color);
     }
 
-    //setting the position of the button (Flarishon)
     void setPosition(sf::Vector2f pos)
     {
         button.setPosition(pos);
@@ -269,13 +243,11 @@ public:
         return button.getPosition();
     }
 
-    //funtion to draw button
     void drawTo(sf::RenderWindow& window)
     {
         window.draw(button);
     }
 
-    //check if mouse is over the button (Flarishon)
     bool isMouseOver(sf::RenderWindow& window)
     {
         int mouseX = sf::Mouse::getPosition(window).x;
@@ -294,19 +266,16 @@ public:
         return false;
     }
 
-    //(Flarishon)
     void setIndex(int newIndex)
     {
         index = newIndex;
     }
 
-    //(Flarishon)
     int getIndex() const
     {
         return index;
     }
 
-    //(Cat-Communist)
     bool MouseisInside(float x, float y)
     {
         if (x > this->x && x < this->x + button_size
@@ -316,8 +285,7 @@ public:
         }
         return false;
     }
-    
-    //(Cat-Communist)
+
     void Alignbutton(Mouse& mouse, Ship& rect)
     {
         if (rect.isDragged && MouseisInside(mouse.x, mouse.y))
@@ -331,7 +299,6 @@ public:
         }
     }
 
-    //use only with battle_cell[0][0] (Cat-Communist)
     bool checkBoundary(Ship& ship)
     {
         float global_border_x0 = button.getPosition().x;
@@ -350,7 +317,6 @@ public:
         return false;
     }
 
-    //(Cat-Communist)
     bool ShipisOn(Ship rect)
     {
         if (button.getPosition().x >= rect.x && button.getPosition().x < rect.x + rect.width
@@ -365,7 +331,6 @@ private:
 
 class Button {
 public:
-    //cunstructor of the btn setting initial size, background color and outline color
     Button() = default;
     Button(sf::Vector2f size, const sf::Color bgColor, sf::Color olColor)
     {
@@ -375,24 +340,21 @@ public:
         button.setOutlineThickness(1.f);
     }
 
-    //setting the button background color
     void setBackColor(sf::Color color)
     {
         button.setFillColor(color);
     }
 
-    //setting the button outline color
     void setLineColor(sf::Color color)
     {
         button.setOutlineColor(color);
     }
 
-    //setting the position of the button
     void setPosition(sf::Vector2f pos)
     {
         button.setPosition(pos);
 
-        float xPos = (pos.x + button.getSize().x / 2); //NOTE: Why? For what purpose?
+        float xPos = (pos.x + button.getSize().x / 2);
         float yPos = (pos.y + button.getSize().y / 2);
     }
 
@@ -406,13 +368,11 @@ public:
         button.setOrigin(pos);
     }
 
-    //funtion to draw button
     void drawTo(sf::RenderWindow& window)
     {
         window.draw(button);
     }
 
-    //check if mouse is over the button
     bool isMouseOver(sf::RenderWindow& window)
     {
         int mouseX = sf::Mouse::getPosition(window).x;
@@ -434,13 +394,11 @@ private:
     sf::RectangleShape button;
 };
 
-//functions (Cat-Communist)
 inline bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShips) {
     for (const Ship* otherShip : otherShips) {
         if (currentShip == otherShip)
             continue;
 
-        // Проверка пересечения (прямое наложение)
         bool isOverlapping =
             currentShip->x < otherShip->x + otherShip->width &&
             currentShip->x + currentShip->width > otherShip->x &&
@@ -451,14 +409,11 @@ inline bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShi
             return true;
         }
 
-        // Проверка расстояния 
-        // Область вокруг корабля
         float expandedLeft = currentShip->x - currentShip->cell;
         float expandedRight = currentShip->x + currentShip->width + currentShip->cell;
         float expandedTop = currentShip->y - currentShip->cell;
         float expandedBottom = currentShip->y + currentShip->height + currentShip->cell;
 
-        // Проверяем, попадает ли другой корабль в расширенную область
         bool isTooClose =
             otherShip->x < expandedRight &&
             otherShip->x + otherShip->width > expandedLeft &&
@@ -472,7 +427,6 @@ inline bool checkCollision(Ship* currentShip, const std::vector<Ship*>& otherShi
     return false;
 }
 
-//(Cat-Communist)
 inline bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship*> otherShips)
 {
     srand(time(NULL));
@@ -500,7 +454,6 @@ inline bool RandomPlacing(BattleCell field[10][10], Ship* ship, std::vector<Ship
     return false;
 }
 
-//Cat-Communist)
 inline void RandomShot(Mouse& mouse, BattleCell field[10][10])
 {
     std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());

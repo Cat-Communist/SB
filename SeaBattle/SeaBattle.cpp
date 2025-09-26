@@ -5,12 +5,10 @@
 #include <iostream>
 #include <fstream>
 
-//presets
 screens screen = screens::MainMenu;
 sf::Font arial("FONTS/arialmt.ttf");
 bool random = false;
 
-//Flarishon
 void copyFieldToBattleField(BattleCell source[10][10], BattleCell target[10][10]) {
     for (int i = 0; i < 10; ++i) {
         for (int j = 0; j < 10; ++j) {
@@ -28,67 +26,65 @@ int main()
     std::string stringOfStat = " ";
 
     Mouse mouse;
-    //ships:
-    //player 1
-    //one-deck
+
     Ship one_deck1P1(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck2P1(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck3P1(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck4P1(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //two-deck
+
     Ship two_deck1P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck2P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck3P1(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //three-deck
+
     Ship three_deck1P1(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship three_deck2P1(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //four-deck
+
     Ship four_deckP1(4, { 10.f, 10.f }, sf::Color(0, 170, 255));
     std::vector<Ship*> shipsP1_container = {
-        //one-deck
+
         &one_deck1P1,
         &one_deck2P1,
         &one_deck3P1,
         &one_deck4P1,
-        //two-deck
+
         &two_deck1P1,
         &two_deck2P1,
         &two_deck3P1,
-        //three-deck
+
         &three_deck1P1,
         &three_deck2P1,
-        //four-deck
+
         &four_deckP1
     };
 
-    //player 2
+
     Ship one_deck1P2(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck2P2(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck3P2(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship one_deck4P2(1, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //two-deck
+
     Ship two_deck1P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck2P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship two_deck3P2(2, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //three-deck
+
     Ship three_deck1P2(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
     Ship three_deck2P2(3, { 10.f, 10.f }, sf::Color(0, 170, 255));
-    //four-deck
+
     Ship four_deckP2(4, { 10.f, 10.f }, sf::Color(0, 170, 255));
     std::vector<Ship*> shipsP2_container = {
-        //one-deck
+
         &one_deck1P2,
         &one_deck2P2,
         &one_deck3P2,
         &one_deck4P2,
-        //two-deck
+
         &two_deck1P2,
         &two_deck2P2,
         &two_deck3P2,
-        //three-deck
+
         &three_deck1P2,
         &three_deck2P2,
-        //four-deck
+
         &four_deckP2
     };
 
@@ -103,7 +99,7 @@ int main()
     BattleCell player2BattleField[10][10];
     float positionX = 225;
     float positionY = 225;
-    // Координаты
+
     for (int i = 0; i < 10; ++i) {
         coordinateLetters[i] = Button({ 50, 50 }, sf::Color(25, 25, 25), sf::Color::White);
         coordinateLetters[i].setPosition({ positionX, 175});
@@ -147,9 +143,6 @@ int main()
     positionY = 225;
     positionX = 225;
 
-    //create a setting field
-    //set ships
-    //player 1
     one_deck1P1.setPosition(player1Field[9][2].getPosition());
     one_deck2P1.setPosition(player1Field[0][3].getPosition());
     one_deck3P1.setPosition(player1Field[6][4].getPosition());
@@ -165,7 +158,6 @@ int main()
 
     four_deckP1.setPosition(player1Field[0][0].getPosition()); four_deckP1.wasClicked = true;
 
-    //player 2
     one_deck1P2.setPosition(player1Field[9][2].getPosition());
     one_deck2P2.setPosition(player1Field[0][3].getPosition());
     one_deck3P2.setPosition(player1Field[6][4].getPosition());
@@ -181,7 +173,6 @@ int main()
 
     four_deckP2.setPosition(player1Field[0][0].getPosition()); four_deckP2.wasClicked = true;
 
-    //menu textures
     sf::Texture bg_texture("Textures/background_img.jpg");
     sf::Sprite bg_sprite(bg_texture);
     bg_sprite.scale({ 5, 5.5 });
@@ -192,7 +183,6 @@ int main()
     sf::Color btn_col_reg  = sf::Color(5, 89, 250, 120);
     sf::Color btn_col_dark = sf::Color(5, 89, 250, 160);
 
-    //setting menu buttons 
     Button btn_PvP(btn_size, btn_col_reg, sf::Color::Black);
     btn_PvP.setOrigin({ btn_size.x / 2, btn_size.y / 2 });
     btn_PvP.setPosition(center);
@@ -206,7 +196,6 @@ int main()
     btn_Exit.setOrigin({ btn_size.x / 2, btn_size.y / 2 });
     btn_Exit.setPosition(center + step + step);
 
-    //setting 'placing ships' buttons
     Button btn_randomPlacing({ 350, 50 }, sf::Color::Black, sf::Color::White);
     btn_randomPlacing.setOrigin({ 350 / 2, 50 / 2 });
     btn_randomPlacing.setPosition({ 450, 800 });
@@ -231,7 +220,6 @@ int main()
     btn_saveEndStat.setOrigin({ btn_size.x / 2, btn_size.y / 2 });
     btn_saveEndStat.setPosition(center + step);
 
-    //setting text
     sf::FloatRect txt_bounds;
     sf::Text txt_PvP(arial, "Player vs Player");
     txt_bounds = txt_PvP.getGlobalBounds();
@@ -251,8 +239,6 @@ int main()
     txt_Exit.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
     txt_Exit.setPosition(center + step + step);
 
-    //setting text for placing ships
-
     sf::Text txt_randomPlacing(arial, "Random");
     txt_bounds = txt_randomPlacing.getGlobalBounds();
     txt_randomPlacing.setFillColor(sf::Color::White);
@@ -271,7 +257,6 @@ int main()
     txt_endPlacingP2.setOrigin({ txt_bounds.getCenter().x, txt_bounds.getCenter().y });
     txt_endPlacingP2.setPosition({ 450, 870 });
 
-    //text for coordinates
     std::vector<sf::Text> letters;
     positionX = 315;
     for (int i = 0; i < 10; i++) {
@@ -374,7 +359,6 @@ int main()
             {
             case screens::MainMenu:
             {
-                //handle events onMouse
                 statVector.clear();
                 PvE = false;
                 turnNumber = 1;
@@ -416,7 +400,7 @@ int main()
                 }
                 break;
             }
-            case screens::FieldPlayer1:// Поле Игрока 1 этапа "Расстановка"
+            case screens::FieldPlayer1:
             {
                 if (PvE)
                     txt_player.setString("Player");
@@ -431,7 +415,6 @@ int main()
                         if (PvE)
                         {
                             screen = screens::BattlePlayer1;
-                            // Сброс позиций кораблей
                             int i = 0;
                             for (Ship* prop : shipsP2_container)
                             {
@@ -446,11 +429,10 @@ int main()
                             for (Ship* ship : shipsP2_container) {
                                 for (int attempt = 0; attempt < 1000; ++attempt) {
                                     if (!RandomPlacing(player2Field, ship, shipsP2_container)) {
-                                        // После успешного размещения обновляем индексы
                                         for (int y = 0; y < 10; ++y) {
                                             for (int x = 0; x < 10; ++x) {
                                                 if (player2Field[y][x].ShipisOn(*ship)) {
-                                                    player2Field[y][x].setIndex(1);  // Помечаем клетки с кораблями
+                                                    player2Field[y][x].setIndex(1);
                                                 }
                                             }
                                         }
@@ -466,7 +448,6 @@ int main()
                                 }
                             }
 
-                            // Копируем расстановку компьютера в поле для атаки игрока
                             copyFieldToBattleField(player2Field, player1BattleField); 
                         }
                         else
@@ -483,7 +464,6 @@ int main()
                     random = true;
                     if (event->is<sf::Event::MouseButtonPressed>())
                     {
-                        // Сброс позиций кораблей
                         int i = 0;
                         for (Ship* prop : shipsP1_container)
                         {
@@ -516,7 +496,7 @@ int main()
                     btn_randomPlacing.setBackColor(sf::Color());
                 break;
             }
-            case screens::FieldPlayer2:// Поле Игрока 2 этапа "Расстановка"
+            case screens::FieldPlayer2:
             {
                 txt_player.setString("Player 2");
                 if (btn_endPlacingP2.isMouseOver(window)) {
@@ -536,7 +516,6 @@ int main()
                     random = true;
                     if (event->is<sf::Event::MouseButtonPressed>())
                     {
-                        // Сброс позиций кораблей
                         int i = 0;
                         for (Ship* prop : shipsP2_container)
                         {
@@ -546,7 +525,6 @@ int main()
                             prop->color = sf::Color(0, 170, 255);
                         }
 
-                        // Пытаемся разместить случайно
                         std::sort(shipsP2_container.begin(), shipsP2_container.end(),
                             [](const Ship* a, const Ship* b) { return a->decks > b->decks; });
 
@@ -570,7 +548,7 @@ int main()
                     btn_randomPlacing.setBackColor(sf::Color());
                 break;
             }
-            case screens::BattlePlayer1:// Поле Игрока 1 этапа "Бой"
+            case screens::BattlePlayer1:
             {
                 txt_turn.setString("Turn " + std::to_string(turnNumber));
                 txt_player.setString("Player 1"); 
@@ -635,7 +613,6 @@ int main()
                                         stringOfStat = "Player 1 [" + std::string(1, 'A' + j) + std::to_string(i + 1) + "] - miss.\n";
                                         statVector.push_back(stringOfStat);
                                     }
-                                    // Если промахнулись - ход переходит к компьютеру
 
                                     else {
                                         lastScreen = screens::BattlePlayer2;
@@ -712,7 +689,7 @@ int main()
 
                 break;
             }
-            case screens::BattlePlayer2:// Поле Игрока 2 этапа "Бой"
+            case screens::BattlePlayer2:
             {
                 txt_turn.setString("Turn " + std::to_string(turnNumber));
                 txt_player.setString("Player 2");
@@ -932,10 +909,8 @@ int main()
                 }
             }
 
-            //update mouse
             mouse.Update(window);
 
-            //updating ships cycle
             for (Ship* prop : shipsP1_container)
             {
                 prop->Draggable(mouse);
@@ -946,11 +921,9 @@ int main()
             {
                 for (int j{}; j < 10; j++)
                 {
-                    //aligning all ships
                     for (Ship* prop : shipsP1_container)
                     {
                         player1Field[i][j].Alignbutton(mouse, *prop);
-                        //setting an index to a cell if ship is not dragged
                         if (player1Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
                             player1Field[i][j].setIndex(1);
@@ -959,7 +932,6 @@ int main()
                 }
             }
 
-            //checking collisions
             for (Ship* prop : shipsP1_container)
             {
                 if (player1Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP1_container))
@@ -971,7 +943,6 @@ int main()
                 }
             }
 
-            //placing if incorrect collision during placing
             for (Ship* prop : shipsP1_container)
             {
                 if (mouse.leftRelease)
@@ -981,7 +952,6 @@ int main()
                 }
             }
 
-            //aborting rotate if too close to other ships
             for (Ship* prop : shipsP1_container)
             {
                 if (mouse.rightRelease)
@@ -995,13 +965,11 @@ int main()
                 }
             }
 
-            //drawing
             for (Ship* prop : shipsP1_container)
             {
                 prop->Draw(window);
             }
 
-            //overlap
             for (Ship* prop : shipsP1_container)
             {
                 if (prop->isDragged)
@@ -1033,10 +1001,8 @@ int main()
                 }
             }
 
-            //update mouse
             mouse.Update(window);
 
-            //updating ships cycle
             for (Ship* prop : shipsP2_container)
             {
                 prop->Draggable(mouse);
@@ -1047,11 +1013,10 @@ int main()
             {
                 for (int j{}; j < 10; j++)
                 {
-                    //aligning all ships
                     for (Ship* prop : shipsP2_container)
                     {
                         player2Field[i][j].Alignbutton(mouse, *prop);
-                        //setting an index to a cell if ship is not dragged
+
                         if (player2Field[i][j].ShipisOn(*prop) && !prop->isDragged)
                         {
                             player2Field[i][j].setIndex(1);
@@ -1060,7 +1025,6 @@ int main()
                 }
             }
 
-            //checking collisions
             for (Ship* prop : shipsP2_container)
             {
                 if (player2Field[0][0].checkBoundary(*prop) || checkCollision(prop, shipsP2_container))
@@ -1075,7 +1039,6 @@ int main()
                 }
             }
 
-            //placing if incorrect collision during placing
             for (Ship* prop : shipsP2_container)
             {
                 if (mouse.leftRelease)
@@ -1085,7 +1048,6 @@ int main()
                 }
             }
 
-            //aborting rotate if too close to other ships
             for (Ship* prop : shipsP2_container)
             {
                 if (mouse.rightRelease)
@@ -1099,13 +1061,11 @@ int main()
                 }
             }
 
-            //drawing
             for (Ship* prop : shipsP2_container)
             {
                 prop->Draw(window);
             }
 
-            //overlap
             for (Ship* prop : shipsP2_container)
             {
                 if (prop->isDragged)
